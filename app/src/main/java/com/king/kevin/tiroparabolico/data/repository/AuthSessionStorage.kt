@@ -2,11 +2,9 @@ package com.king.kevin.tiroparabolico.data.repository
 
 import android.content.Context
 import com.king.kevin.tiroparabolico.domain.model.UserSession
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
 
-class AuthSessionStorage @Inject constructor(
-    @ApplicationContext context: Context
+class AuthSessionStorage(
+    context: Context
 ) {
     private val preferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
 

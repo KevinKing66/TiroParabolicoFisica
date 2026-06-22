@@ -10,9 +10,8 @@ import java.io.BufferedReader
 import java.io.OutputStreamWriter
 import java.net.HttpURLConnection
 import java.net.URL
-import javax.inject.Inject
 
-class AuthRemoteDataSource @Inject constructor() {
+class AuthRemoteDataSource() {
     suspend fun login(request: LoginRequestDto): String = withContext(Dispatchers.IO) {
         postJson(
             endpoint = PhysicsConstants.LOGIN_ENDPOINT,

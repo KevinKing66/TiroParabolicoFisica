@@ -1,9 +1,8 @@
 package com.king.kevin.tiroparabolico.data.remote
 
 import org.json.JSONObject
-import javax.inject.Inject
 
-class AuthResponseParser @Inject constructor() {
+class AuthResponseParser() {
     fun extractToken(responseBody: String): String? {
         val trimmed = responseBody.trim()
         if (trimmed.isBlank()) return null

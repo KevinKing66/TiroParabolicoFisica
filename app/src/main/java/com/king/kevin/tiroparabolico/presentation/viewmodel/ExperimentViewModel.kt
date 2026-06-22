@@ -9,16 +9,13 @@ import com.king.kevin.tiroparabolico.domain.usecases.CalculateProjectileExperime
 import com.king.kevin.tiroparabolico.domain.usecases.ObserveExperimentsUseCase
 import com.king.kevin.tiroparabolico.domain.usecases.SaveExperimentUseCase
 import com.king.kevin.tiroparabolico.presentation.state.ExperimentUiState
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ExperimentViewModel @Inject constructor(
+class ExperimentViewModel(
     private val calculateProjectileExperiment: CalculateProjectileExperimentUseCase,
     private val saveExperiment: SaveExperimentUseCase,
     observeExperiments: ObserveExperimentsUseCase

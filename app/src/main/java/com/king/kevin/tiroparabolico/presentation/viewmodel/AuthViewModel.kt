@@ -9,19 +9,16 @@ import com.king.kevin.tiroparabolico.domain.usecases.LoginUseCase
 import com.king.kevin.tiroparabolico.domain.usecases.RegisterUseCase
 import com.king.kevin.tiroparabolico.presentation.state.AuthMode
 import com.king.kevin.tiroparabolico.presentation.state.AuthUiState
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class AuthViewModel @Inject constructor(
+class AuthViewModel(
     private val loginUseCase: LoginUseCase,
     private val registerUseCase: RegisterUseCase,
-    getCurrentSession: GetCurrentSessionUseCase
+    private val getCurrentSession: GetCurrentSessionUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AuthUiState(session = getCurrentSession()))
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()

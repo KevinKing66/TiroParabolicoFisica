@@ -1,7 +1,14 @@
 package com.king.kevin.tiroparabolico
 
 import android.app.Application
-import dagger.hilt.android.HiltAndroidApp
+import com.king.kevin.tiroparabolico.di.AppContainer
 
-@HiltAndroidApp
-class PhysicsLabApplication : Application()
+class PhysicsLabApplication : Application() {
+    lateinit var appContainer: AppContainer
+        private set
+
+    override fun onCreate() {
+        super.onCreate()
+        appContainer = AppContainer(this)
+    }
+}

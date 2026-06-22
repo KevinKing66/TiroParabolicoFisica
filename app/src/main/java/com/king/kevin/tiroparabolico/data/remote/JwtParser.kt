@@ -3,9 +3,8 @@ package com.king.kevin.tiroparabolico.data.remote
 import android.util.Base64
 import com.king.kevin.tiroparabolico.domain.model.UserSession
 import org.json.JSONObject
-import javax.inject.Inject
 
-class JwtParser @Inject constructor() {
+class JwtParser {
     fun parse(token: String): UserSession {
         val payload = token.split(".").getOrNull(1)
             ?: throw IllegalArgumentException("La respuesta no contiene un JWT valido.")
