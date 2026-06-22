@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /projectile_experiments/{experimentId} {
+      allow read: if true;
+      allow create: if request.resource.data.initialVelocity is number
+        && request.resource.data.initialVelocity > 0
+        && request.resource.data.launchAngleDegrees is number
+        && request.resource.data.launchAngleDegrees >= 0
+        && request.resource.data.launchAngleDegrees <= 90
+        && request.resource.data.gravity is number
+        && request.resource.data.gravity > 0;
+      allow update, delete: if false;
+    }
+  }
+}

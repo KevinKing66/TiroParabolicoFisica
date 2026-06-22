@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Laboratorio Virtual de Fisica - Tiro Parabolico</string>
+    <string name="trajectory_canvas_description">Simulacion visual de la trayectoria parabolica</string>
+</resources>

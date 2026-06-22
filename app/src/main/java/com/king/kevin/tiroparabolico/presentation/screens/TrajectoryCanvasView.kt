@@ -1,0 +1,122 @@
+package com.king.kevin.tiroparabolico.presentation.screens
+
+import android.animation.ValueAnimator
+import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
+import android.util.AttributeSet
+import android.view.View
+import androidx.core.content.ContextCompat
+import com.king.kevin.tiroparabolico.R
+import com.king.kevin.tiroparabolico.domain.model.TrajectoryPoint
+import kotlin.math.max
+
+class TrajectoryCanvasView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : View(context, attrs, defStyleAttr) {
+    private val axisPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = ContextCompat.getColor(context, R.color.axis_color)
+        strokeWidth = 3f
+        style = Paint.Style.STROKE
+    }
+    private val pathPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = ContextCompat.getColor(context, R.color.trajectory_color)
+        strokeWidth = 7f
+        strokeCap = Paint.Cap.ROUND
+        strokeJoin = Paint.Join.ROUND
+        style = Paint.Style.STROKE
+    }
+    private val projectilePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = ContextCompat.getColor(context, R.color.projectile_color)
+        style = Paint.Style.FILL
+    }
+    private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = ContextCompat.getColor(context, R.color.grid_color)
+        strokeWidth = 1.5f
+        style = Paint.Style.STROKE
+    }
+
+    private var trajectory: List<TrajectoryPoint> = emptyList()
+    private var animationProgress: Float = 1f
+    private var animator: ValueAnimator? = null
+
+    fun submitTrajectory(points: List<TrajectoryPoint>) {
+        trajectory = points
+        animator?.cancel()
+        animationProgress = 0f
+        animator = ValueAnimator.ofFloat(0f, 1f).apply {
+            duration = 1200L
+            addUpdateListener {
+                animationProgress = it.animatedValue as Float
+                invalidate()
+            }
+            start()
+        }
+    }
+
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        drawGrid(canvas)
+        drawAxes(canvas)
+        if (trajectory.isEmpty()) return
+
+        val left = paddingLeft + 28f
+        val right = width - paddingRight - 20f
+        val top = paddingTop + 24f
+        val bottom = height - paddingBottom - 32f
+        val maxX = max(trajectory.maxOf { it.x }, 1.0)
+        val maxY = max(trajectory.maxOf { it.y }, 1.0)
+        val visibleCount = max(2, (trajectory.size * animationProgress).toInt())
+        val visiblePoints = trajectory.take(visibleCount)
+        val path = Path()
+
+        visiblePoints.forEachIndexed { index, point ->
+            val px = left + ((point.x / maxX) * (right - left)).toFloat()
+            val py = bottom - ((point.y / maxY) * (bottom - top)).toFloat()
+            if (index == 0) {
+                path.moveTo(px, py)
+            } else {
+                path.lineTo(px, py)
+            }
+        }
+
+        canvas.drawPath(path, pathPaint)
+        visiblePoints.lastOrNull()?.let { point ->
+            val px = left + ((point.x / maxX) * (right - left)).toFloat()
+            val py = bottom - ((point.y / maxY) * (bottom - top)).toFloat()
+            canvas.drawCircle(px, py, 11f, projectilePaint)
+        }
+    }
+
+    private fun drawAxes(canvas: Canvas) {
+        val left = paddingLeft + 28f
+        val bottom = height - paddingBottom - 32f
+        canvas.drawLine(left, paddingTop + 20f, left, bottom, axisPaint)
+        canvas.drawLine(left, bottom, width - paddingRight - 18f, bottom, axisPaint)
+    }
+
+    private fun drawGrid(canvas: Canvas) {
+        val columns = 4
+        val rows = 4
+        val left = paddingLeft + 28f
+        val right = width - paddingRight - 20f
+        val top = paddingTop + 24f
+        val bottom = height - paddingBottom - 32f
+        repeat(columns + 1) { index ->
+            val x = left + ((right - left) * index / columns)
+            canvas.drawLine(x, top, x, bottom, gridPaint)
+        }
+        repeat(rows + 1) { index ->
+            val y = top + ((bottom - top) * index / rows)
+            canvas.drawLine(left, y, right, y, gridPaint)
+        }
+    }
+
+    override fun onDetachedFromWindow() {
+        animator?.cancel()
+        super.onDetachedFromWindow()
+    }
+}

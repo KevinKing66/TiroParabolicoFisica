@@ -1,0 +1,13 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.TiroParabolico" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="colorPrimary">@color/brand_primary</item>
+        <item name="colorPrimaryContainer">@color/brand_primary_light</item>
+        <item name="colorSecondary">@color/brand_accent</item>
+        <item name="colorSurface">@color/surface_panel</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@color/surface_background</item>
+    </style>
+</resources>
