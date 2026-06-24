@@ -95,11 +95,11 @@ class MainActivity : AppCompatActivity() {
         if (experiment == null) return
 
         binding.resultsText.text = buildString {
-            appendLine("vx = ${experiment.horizontalVelocity.toDisplay()} m/s")
-            appendLine("vy = ${experiment.verticalVelocity.toDisplay()} m/s")
-            appendLine("T = ${experiment.flightTime.toDisplay()} s")
-            appendLine("H = ${experiment.maxHeight.toDisplay()} m")
-            appendLine("R = ${experiment.horizontalRange.toDisplay()} m")
+            appendLine("Vx = ${experiment.horizontalVelocity.toDisplay()} m/s")
+            appendLine("Vy = ${experiment.verticalVelocity.toDisplay()} m/s")
+            appendLine("tiempo (t) = ${experiment.flightTime.toDisplay()} s")
+            appendLine("Altura máxima (h) = ${experiment.maxHeight.toDisplay()} m")
+            appendLine("Alcance horizontal (R) = ${experiment.horizontalRange.toDisplay()} m")
             append("g = ${experiment.gravity.toDisplay()} m/s2")
         }
         binding.trajectoryView.submitTrajectory(experiment.trajectory)
