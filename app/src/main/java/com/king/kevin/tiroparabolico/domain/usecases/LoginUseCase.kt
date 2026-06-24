@@ -3,9 +3,8 @@ package com.king.kevin.tiroparabolico.domain.usecases
 import com.king.kevin.tiroparabolico.domain.model.LoginInput
 import com.king.kevin.tiroparabolico.domain.model.UserSession
 import com.king.kevin.tiroparabolico.domain.repository.AuthRepository
-import javax.inject.Inject
 
-class LoginUseCase @Inject constructor(
+class LoginUseCase(
     private val repository: AuthRepository,
     private val validateAuthInput: ValidateAuthInputUseCase
 ) {

@@ -1,9 +1,8 @@
 package com.king.kevin.tiroparabolico.domain.usecases
 
 import com.king.kevin.tiroparabolico.domain.model.ExperimentInput
-import javax.inject.Inject
 
-class ValidateExperimentInputUseCase @Inject constructor() {
+class ValidateExperimentInputUseCase() {
     operator fun invoke(input: ExperimentInput): Result<Unit> {
         return when {
             input.initialVelocity <= 0.0 -> Result.failure(IllegalArgumentException("La velocidad inicial debe ser mayor que cero."))

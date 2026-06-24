@@ -3,7 +3,6 @@ package com.king.kevin.tiroparabolico
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -19,13 +18,11 @@ import com.king.kevin.tiroparabolico.domain.model.ProjectileExperiment
 import com.king.kevin.tiroparabolico.presentation.screens.ExperimentHistoryAdapter
 import com.king.kevin.tiroparabolico.presentation.state.ExperimentUiState
 import com.king.kevin.tiroparabolico.presentation.viewmodel.ExperimentViewModel
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    private val viewModel: ExperimentViewModel by viewModels()
+    private lateinit var viewModel: ExperimentViewModel
     private val historyAdapter = ExperimentHistoryAdapter { viewModel.selectExperiment(it) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +30,11 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        
+        // Inicializar ViewModel usando el contenedor de dependencias
+        val appContainer = (application as PhysicsLabApplication).appContainer
+        viewModel = appContainer.createExperimentViewModel()
+        
         setupInsets()
         setupHistory()
         setupActions()

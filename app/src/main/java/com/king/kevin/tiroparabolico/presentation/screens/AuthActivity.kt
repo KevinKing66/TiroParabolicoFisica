@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -13,17 +12,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.snackbar.Snackbar
 import com.king.kevin.tiroparabolico.MainActivity
+import com.king.kevin.tiroparabolico.PhysicsLabApplication
 import com.king.kevin.tiroparabolico.databinding.ActivityAuthBinding
 import com.king.kevin.tiroparabolico.presentation.state.AuthMode
 import com.king.kevin.tiroparabolico.presentation.state.AuthUiState
 import com.king.kevin.tiroparabolico.presentation.viewmodel.AuthViewModel
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
 class AuthActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAuthBinding
-    private val viewModel: AuthViewModel by viewModels()
+    private lateinit var viewModel: AuthViewModel
     private var hasNavigated = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +29,11 @@ class AuthActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        
+        // Inicializar ViewModel usando el contenedor de dependencias
+        val appContainer = (application as PhysicsLabApplication).appContainer
+        viewModel = appContainer.createAuthViewModel()
+        
         setupInsets()
         setupActions()
         observeUiState()

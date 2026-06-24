@@ -9,9 +9,8 @@ import com.king.kevin.tiroparabolico.domain.model.LoginInput
 import com.king.kevin.tiroparabolico.domain.model.RegisterInput
 import com.king.kevin.tiroparabolico.domain.model.UserSession
 import com.king.kevin.tiroparabolico.domain.repository.AuthRepository
-import javax.inject.Inject
 
-class AuthRepositoryImpl @Inject constructor(
+class AuthRepositoryImpl(
     private val remoteDataSource: AuthRemoteDataSource,
     private val responseParser: AuthResponseParser,
     private val jwtParser: JwtParser,

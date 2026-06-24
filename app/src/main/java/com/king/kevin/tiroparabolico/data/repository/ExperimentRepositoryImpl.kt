@@ -6,9 +6,8 @@ import com.king.kevin.tiroparabolico.domain.repository.ExperimentRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
-import javax.inject.Inject
 
-class ExperimentRepositoryImpl @Inject constructor(
+class ExperimentRepositoryImpl(
     private val remoteDataSource: ExperimentRemoteDataSource
 ) : ExperimentRepository {
     override fun observeExperiments(): Flow<Result<List<ProjectileExperiment>>> {

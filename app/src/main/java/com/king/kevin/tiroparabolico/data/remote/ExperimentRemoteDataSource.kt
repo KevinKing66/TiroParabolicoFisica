@@ -8,15 +8,13 @@ import com.king.kevin.tiroparabolico.core.constants.PhysicsConstants
 import com.king.kevin.tiroparabolico.data.dto.ProjectileExperimentDto
 import com.king.kevin.tiroparabolico.data.dto.toDto
 import com.king.kevin.tiroparabolico.domain.model.ProjectileExperiment
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-import javax.inject.Inject
 
-class ExperimentRemoteDataSource @Inject constructor(
-    @param:ApplicationContext private val context: Context
+class ExperimentRemoteDataSource(
+    private val context: Context
 ) {
     fun observeExperiments(): Flow<Result<List<ProjectileExperiment>>> = callbackFlow {
         val firestore = getFirestoreOrNull()

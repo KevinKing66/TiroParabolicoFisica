@@ -7,7 +7,7 @@ import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
 
-class CalculateProjectileExperimentUseCase @javax.inject.Inject constructor(
+class CalculateProjectileExperimentUseCase(
     private val validateExperimentInput: ValidateExperimentInputUseCase
 ) {
     operator fun invoke(input: ExperimentInput): Result<ProjectileExperiment> {
