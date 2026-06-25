@@ -3,9 +3,7 @@ package com.king.kevin.tiroparabolico
 import android.app.Application
 import com.king.kevin.tiroparabolico.data.remote.AcademicRemoteDataSource
 import com.king.kevin.tiroparabolico.data.remote.AuthRemoteDataSource
-import com.king.kevin.tiroparabolico.data.remote.AuthResponseParser
 import com.king.kevin.tiroparabolico.data.remote.ExperimentRemoteDataSource
-import com.king.kevin.tiroparabolico.data.remote.JwtParser
 import com.king.kevin.tiroparabolico.data.repository.AcademicRepositoryImpl
 import com.king.kevin.tiroparabolico.data.repository.AuthRepositoryImpl
 import com.king.kevin.tiroparabolico.data.repository.AuthSessionStorage
@@ -31,12 +29,10 @@ class PhysicsLabApplication : Application() {
     private val authRemoteDataSource by lazy { AuthRemoteDataSource() }
     private val experimentRemoteDataSource by lazy { ExperimentRemoteDataSource(this, authSessionStorage) }
     private val academicRemoteDataSource by lazy { AcademicRemoteDataSource(this, authSessionStorage) }
-    private val authResponseParser by lazy { AuthResponseParser() }
-    private val jwtParser by lazy { JwtParser() }
     private val authSessionStorage by lazy { AuthSessionStorage(this) }
 
     val authRepository: AuthRepository by lazy {
-        AuthRepositoryImpl(authRemoteDataSource, authResponseParser, jwtParser, authSessionStorage)
+        AuthRepositoryImpl(authRemoteDataSource, authSessionStorage)
     }
     val experimentRepository: ExperimentRepository by lazy {
         ExperimentRepositoryImpl(experimentRemoteDataSource)

@@ -1,86 +1,66 @@
 package com.king.kevin.tiroparabolico.data.remote
 
-import com.king.kevin.tiroparabolico.core.constants.PhysicsConstants
+import com.google.firebase.database.FirebaseDatabase
 import com.king.kevin.tiroparabolico.data.dto.LoginRequestDto
 import com.king.kevin.tiroparabolico.data.dto.RegisterRequestDto
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import java.io.BufferedReader
-import java.io.OutputStreamWriter
-import java.net.HttpURLConnection
-import java.net.URL
+import com.king.kevin.tiroparabolico.domain.model.UserSession
+import kotlinx.coroutines.tasks.await
+import java.util.UUID
 
 class AuthRemoteDataSource() {
-    suspend fun login(request: LoginRequestDto): String = withContext(Dispatchers.IO) {
-        postJson(
-            endpoint = PhysicsConstants.LOGIN_ENDPOINT,
-            body = JSONObject()
-                .put("email", request.email)
-                .put("password", request.password)
+
+    private val database = FirebaseDatabase.getInstance()
+    private val usersRef = database.getReference("users")
+
+    suspend fun login(request: LoginRequestDto): UserSession {
+        val snapshot = usersRef.orderByChild("email").equalTo(request.email).get().await()
+        
+        if (!snapshot.exists()) {
+            throw IllegalStateException("Usuario no encontrado.")
+        }
+
+        val userSnapshot = snapshot.children.first()
+        val storedPassword = userSnapshot.child("password").getValue(String::class.java)
+
+        if (storedPassword != request.password) {
+            throw IllegalStateException("Contraseña incorrecta.")
+        }
+
+        return UserSession(
+            token = userSnapshot.key ?: UUID.randomUUID().toString(),
+            fullName = userSnapshot.child("fullname").getValue(String::class.java).orEmpty(),
+            code = userSnapshot.child("code").getValue(String::class.java).orEmpty(),
+            role = userSnapshot.child("role").getValue(String::class.java) ?: "student",
+            course = userSnapshot.child("courseCode").getValue(String::class.java).orEmpty()
         )
     }
 
-    suspend fun register(request: RegisterRequestDto): String = withContext(Dispatchers.IO) {
-        val body = JSONObject()
-            .put("fullname", request.fullname)
-            .put("password", request.password)
-            .put("email", request.email)
-            .put("nombreInstitucion", request.institutionName)
+    suspend fun register(request: RegisterRequestDto): UserSession {
+        // Verificar si ya existe
+        val existing = usersRef.orderByChild("email").equalTo(request.email).get().await()
+        if (existing.exists()) {
+            throw IllegalStateException("El correo electrónico ya está registrado.")
+        }
 
-        request.courseCode
-            ?.takeIf { it.isNotBlank() }
-            ?.let { body.put("codigoCurso", it) }
-
-        postJson(
-            endpoint = PhysicsConstants.REGISTER_ENDPOINT,
-            body = body
+        val userId = usersRef.push().key ?: UUID.randomUUID().toString()
+        val userMap = mapOf(
+            "fullname" to request.fullname,
+            "email" to request.email,
+            "password" to request.password,
+            "institutionName" to request.institutionName,
+            "courseCode" to request.courseCode,
+            "code" to (request.courseCode + "-" + (100..999).random()),
+            "role" to "student"
         )
-    }
 
-    private fun postJson(endpoint: String, body: JSONObject): String {
-        val connection = (URL("${PhysicsConstants.AUTH_BASE_URL}$endpoint").openConnection() as HttpURLConnection).apply {
-            requestMethod = "POST"
-            connectTimeout = TIMEOUT_MILLIS
-            readTimeout = TIMEOUT_MILLIS
-            doOutput = true
-            setRequestProperty("Content-Type", "application/json; charset=utf-8")
-            setRequestProperty("Accept", "application/json")
-        }
+        usersRef.child(userId).setValue(userMap).await()
 
-        return try {
-            OutputStreamWriter(connection.outputStream, Charsets.UTF_8).use { writer ->
-                writer.write(body.toString())
-            }
-
-            val responseCode = connection.responseCode
-            val responseBody = readResponse(connection, responseCode)
-            if (responseCode !in 200..299) {
-                throw IllegalStateException(extractErrorMessage(responseBody, responseCode))
-            }
-            responseBody
-        } finally {
-            connection.disconnect()
-        }
-    }
-
-    private fun readResponse(connection: HttpURLConnection, responseCode: Int): String {
-        val stream = if (responseCode in 200..299) connection.inputStream else connection.errorStream
-        return stream?.bufferedReader(Charsets.UTF_8)?.use(BufferedReader::readText).orEmpty()
-    }
-
-    private fun extractErrorMessage(responseBody: String, responseCode: Int): String {
-        val serverMessage = runCatching {
-            val json = JSONObject(responseBody)
-            json.optString("message")
-                .ifBlank { json.optString("error") }
-                .ifBlank { json.optString("detail") }
-        }.getOrDefault("")
-
-        return serverMessage.ifBlank { "Error de autenticacion. Codigo HTTP $responseCode." }
-    }
-
-    private companion object {
-        const val TIMEOUT_MILLIS = 15_000
+        return UserSession(
+            token = userId,
+            fullName = request.fullname,
+            code = userMap["code"] as String,
+            role = "student",
+            course = request.courseCode
+        )
     }
 }

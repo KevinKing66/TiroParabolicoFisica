@@ -10,5 +10,5 @@ data class RegisterRequestDto(
     val password: String,
     val email: String,
     val institutionName: String,
-    val courseCode: String?
+    val courseCode: String
 )
