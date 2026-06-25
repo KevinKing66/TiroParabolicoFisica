@@ -3,6 +3,7 @@ package com.king.kevin.tiroparabolico.data.dto
 import com.king.kevin.tiroparabolico.domain.model.ProjectileExperiment
 
 data class ProjectileExperimentDto(
+    val userCode: String = "",
     val initialVelocity: Double = 0.0,
     val launchAngleDegrees: Double = 0.0,
     val gravity: Double = 0.0,
@@ -31,8 +32,9 @@ data class ProjectileExperimentDto(
     }
 }
 
-fun ProjectileExperiment.toDto(): ProjectileExperimentDto {
+fun ProjectileExperiment.toDto(userCode: String = ""): ProjectileExperimentDto {
     return ProjectileExperimentDto(
+        userCode = userCode,
         initialVelocity = initialVelocity,
         launchAngleDegrees = launchAngleDegrees,
         gravity = gravity,

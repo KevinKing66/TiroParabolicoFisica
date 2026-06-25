@@ -4,6 +4,7 @@ import com.king.kevin.tiroparabolico.domain.model.AcademicResponse
 import com.king.kevin.tiroparabolico.domain.model.AcademicType
 
 data class AcademicResponseDto(
+    val userCode: String = "",
     val type: String = "",
     val answers: Map<String, String> = emptyMap(),
     val createdAtMillis: Long = 0L
@@ -16,7 +17,8 @@ data class AcademicResponseDto(
     )
 }
 
-fun AcademicResponse.toDto(): AcademicResponseDto = AcademicResponseDto(
+fun AcademicResponse.toDto(userCode: String = ""): AcademicResponseDto = AcademicResponseDto(
+    userCode = userCode,
     type = type.name,
     answers = answers,
     createdAtMillis = createdAtMillis

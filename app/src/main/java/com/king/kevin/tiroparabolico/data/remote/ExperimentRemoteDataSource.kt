@@ -2,11 +2,14 @@ package com.king.kevin.tiroparabolico.data.remote
 
 import android.content.Context
 import com.google.firebase.FirebaseApp
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.king.kevin.tiroparabolico.core.constants.PhysicsConstants
 import com.king.kevin.tiroparabolico.data.dto.ProjectileExperimentDto
 import com.king.kevin.tiroparabolico.data.dto.toDto
+import com.king.kevin.tiroparabolico.data.repository.AuthSessionStorage
 import com.king.kevin.tiroparabolico.domain.model.ProjectileExperiment
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -14,50 +17,57 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class ExperimentRemoteDataSource(
-    private val context: Context
+    private val context: Context,
+    private val sessionStorage: AuthSessionStorage
 ) {
     fun observeExperiments(): Flow<Result<List<ProjectileExperiment>>> = callbackFlow {
-        val firestore = getFirestoreOrNull()
-        if (firestore == null) {
-            trySend(Result.failure(IllegalStateException("Firebase no esta configurado. Agrega google-services.json para persistencia remota.")))
+        val database = getDatabaseOrNull()
+        if (database == null) {
+            trySend(Result.failure(IllegalStateException("Firebase no esta configurado.")))
             close()
             return@callbackFlow
         }
 
-        val registration = firestore.collection(PhysicsConstants.EXPERIMENT_COLLECTION)
-            .orderBy("createdAtMillis", Query.Direction.DESCENDING)
-            .addSnapshotListener { snapshot, exception ->
-                if (exception != null) {
-                    trySend(Result.failure(exception))
-                    return@addSnapshotListener
-                }
+        val userCode = sessionStorage.get()?.code ?: ""
+        val reference = database.getReference(PhysicsConstants.EXPERIMENT_COLLECTION)
+        
+        val query = reference.orderByChild("userCode").equalTo(userCode)
 
-                val documents = snapshot?.documents.orEmpty()
-                val experiments = documents.mapNotNull { document ->
-                    document.toObject(ProjectileExperimentDto::class.java)?.toDomain(document.id)
-                }
+        val listener = object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val experiments = snapshot.children.mapNotNull { child ->
+                    child.getValue(ProjectileExperimentDto::class.java)?.toDomain(child.key ?: "")
+                }.sortedByDescending { it.createdAtMillis }
+                
                 trySend(Result.success(experiments))
             }
 
-        awaitClose { registration.remove() }
+            override fun onCancelled(error: DatabaseError) {
+                trySend(Result.failure(error.toException()))
+            }
+        }
+
+        query.addValueEventListener(listener)
+        awaitClose { query.removeEventListener(listener) }
     }
 
     suspend fun saveExperiment(experiment: ProjectileExperiment): Result<Unit> = runCatching {
-        val firestore = getFirestoreOrNull()
-            ?: throw IllegalStateException("Firebase no esta configurado. Agrega google-services.json para guardar experimentos.")
+        val database = getDatabaseOrNull()
+            ?: throw IllegalStateException("Firebase no esta configurado.")
 
-        firestore.collection(PhysicsConstants.EXPERIMENT_COLLECTION)
-            .add(experiment.toDto())
-            .await()
+        val userCode = sessionStorage.get()?.code ?: "anonymous"
+        val reference = database.getReference(PhysicsConstants.EXPERIMENT_COLLECTION)
+
+        reference.push().setValue(experiment.toDto(userCode)).await()
         Unit
     }
 
-    private fun getFirestoreOrNull(): FirebaseFirestore? {
+    private fun getDatabaseOrNull(): FirebaseDatabase? {
         return runCatching {
             if (FirebaseApp.getApps(context).isEmpty()) {
                 FirebaseApp.initializeApp(context)
             }
-            FirebaseFirestore.getInstance()
+            FirebaseDatabase.getInstance()
         }.getOrNull()
     }
 }

@@ -33,9 +33,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
-        // Inicializar ViewModel usando el contenedor de dependencias
-        val appContainer = (application as PhysicsLabApplication).appContainer
-        viewModel = appContainer.createExperimentViewModel()
+        val app = application as PhysicsLabApplication
+        viewModel = app.createExperimentViewModel()
         
         setupInsets()
         setupHistory()

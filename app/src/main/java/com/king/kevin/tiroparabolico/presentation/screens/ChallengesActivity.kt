@@ -28,8 +28,8 @@ class ChallengesActivity : AppCompatActivity() {
         binding = ActivityChallengesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val appContainer = (application as PhysicsLabApplication).appContainer
-        viewModel = appContainer.createAcademicViewModel()
+        val app = application as PhysicsLabApplication
+        viewModel = app.createAcademicViewModel()
 
         setupInsets()
         setupToolbar()
@@ -67,6 +67,8 @@ class ChallengesActivity : AppCompatActivity() {
                 type = AcademicType.CHALLENGES,
                 answers = answers
             )
+            binding.progressBar.visibility = View.VISIBLE
+            binding.btnSave.isEnabled = false
             viewModel.saveResponse(response)
         }
     }

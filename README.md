@@ -2,7 +2,7 @@
 
 Aplicacion Android desarrollada en Kotlin para simular el movimiento de proyectiles, visualizar la trayectoria parabolica, autenticar usuarios y guardar experimentos en una base de datos remota.
 
-El proyecto esta organizado con Clean Architecture, MVVM, Hilt, Coroutines, Flow, ViewBinding, Material Design 3 y pruebas unitarias para los calculos fisicos.
+El proyecto esta organizado con Clean Architecture, MVVM, Coroutines, Flow, ViewBinding, Material Design 3 y pruebas unitarias para los calculos fisicos.
 
 ## Funcionalidades
 
@@ -16,7 +16,7 @@ El proyecto esta organizado con Clean Architecture, MVVM, Hilt, Coroutines, Flow
   - Altura maxima.
   - Alcance horizontal.
 - Visualizacion de trayectoria usando Canvas.
-- Guardado remoto de experimentos en Firebase Firestore.
+- Guardado remoto de experimentos en Firebase Realtime Database.
 - Historial remoto de experimentos para comparacion.
 - Soporte para modo claro y oscuro.
 - Paleta visual basada en `#034C6F`.
@@ -43,7 +43,6 @@ app/src/main/java/com/king/kevin/tiroparabolico/
     screens/
     state/
     viewmodel/
-  di/
 ```
 
 ### Presentation
@@ -159,9 +158,9 @@ Body enviado:
 
 > Nota: si pruebas desde un emulador Android y el backend corre en tu computador, normalmente debes usar `http://10.0.2.2:8080` en lugar de `127.0.0.7`.
 
-## Firebase Firestore
+## Firebase Realtime Database
 
-Los experimentos se guardan en la coleccion:
+Los experimentos se guardan en el nodo:
 
 ```text
 projectile_experiments
@@ -181,12 +180,6 @@ com.king.kevin.tiroparabolico
 
 ```text
 app/google-services.json
-```
-
-5. Revisar las reglas sugeridas en:
-
-```text
-firestore.rules
 ```
 
 Si Firebase no esta configurado, la app muestra un mensaje de error controlado y evita cierres inesperados.
@@ -217,7 +210,6 @@ Colores principales:
 - Clean Architecture con separacion Presentation, Domain y Data.
 - MVVM para desacoplar UI y logica.
 - Repository Pattern para abstraer fuentes remotas.
-- Hilt para inyeccion de dependencias.
 - Data classes para modelos y DTOs.
 - Validaciones encapsuladas en casos de uso.
 - Calculos fisicos puros y testeables.
@@ -282,7 +274,6 @@ app/build/outputs/apk/debug/app-debug.apk
 ## Consideraciones tecnicas
 
 - El proyecto usa AGP 9.2.1.
-- Se mantiene `android.builtInKotlin=false` y `android.newDsl=false` por compatibilidad con KAPT/Hilt en esta configuracion.
 - No ejecutar dos tareas Gradle pesadas en paralelo, porque Kotlin puede bloquear caches incrementales. Ejecutar pruebas y ensamblado en secuencia.
 
 ## Estructura de recursos UI

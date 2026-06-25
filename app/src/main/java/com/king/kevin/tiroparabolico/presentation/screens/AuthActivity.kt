@@ -30,9 +30,8 @@ class AuthActivity : AppCompatActivity() {
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
-        // Inicializar ViewModel usando el contenedor de dependencias
-        val appContainer = (application as PhysicsLabApplication).appContainer
-        viewModel = appContainer.createAuthViewModel()
+        val app = application as PhysicsLabApplication
+        viewModel = app.createAuthViewModel()
         
         setupInsets()
         setupActions()

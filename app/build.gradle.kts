@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
+apply(plugin = "com.google.gms.google-services")
+
 android {
     namespace = "com.king.kevin.tiroparabolico"
     compileSdk = 37
@@ -48,6 +50,7 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.recyclerview)
+    implementation("com.google.firebase:firebase-database:22.0.1")
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.material)
