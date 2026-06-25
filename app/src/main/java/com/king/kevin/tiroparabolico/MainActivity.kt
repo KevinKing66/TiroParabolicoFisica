@@ -1,5 +1,6 @@
 package com.king.kevin.tiroparabolico
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.enableEdgeToEdge
@@ -15,6 +16,8 @@ import com.king.kevin.tiroparabolico.core.extensions.toNullableDouble
 import com.king.kevin.tiroparabolico.core.utils.toDisplay
 import com.king.kevin.tiroparabolico.databinding.ActivityMainBinding
 import com.king.kevin.tiroparabolico.domain.model.ProjectileExperiment
+import com.king.kevin.tiroparabolico.presentation.screens.AnalysisActivity
+import com.king.kevin.tiroparabolico.presentation.screens.ChallengesActivity
 import com.king.kevin.tiroparabolico.presentation.screens.ExperimentHistoryAdapter
 import com.king.kevin.tiroparabolico.presentation.state.ExperimentUiState
 import com.king.kevin.tiroparabolico.presentation.viewmodel.ExperimentViewModel
@@ -70,6 +73,14 @@ class MainActivity : AppCompatActivity() {
             viewModel.simulate(velocity, angle, gravity)
         }
         binding.saveButton.setOnClickListener { viewModel.saveCurrentExperiment() }
+        
+        binding.btnAnalysis.setOnClickListener {
+            startActivity(Intent(this, AnalysisActivity::class.java))
+        }
+        
+        binding.btnChallenges.setOnClickListener {
+            startActivity(Intent(this, ChallengesActivity::class.java))
+        }
     }
 
     private fun observeUiState() {

@@ -1,4 +1,29 @@
 <resources>
     <string name="app_name">Laboratorio Virtual de Fisica - Tiro Parabolico</string>
     <string name="trajectory_canvas_description">Simulacion visual de la trayectoria parabolica</string>
+
+    <!-- Academic Activities -->
+    <string name="academic_lab_title">Laboratorio Académico</string>
+    <string name="btn_analysis">Preguntas de Análisis</string>
+    <string name="btn_challenges">Retos de Decisión</string>
+    <string name="save_answers">Guardar Respuestas</string>
+    <string name="saving">Guardando...</string>
+    <string name="save_success">Respuestas guardadas correctamente</string>
+    <string name="save_error">Error al guardar las respuestas</string>
+    <string name="complete_all_fields">Por favor, completa todas las preguntas</string>
+
+    <!-- Analysis Questions -->
+    <string name="analysis_title">Análisis de Resultados</string>
+    <string name="analysis_q1">1. Realiza varios lanzamientos con la misma velocidad y distintos ángulos. ¿Con qué ángulo obtienes el mayor alcance? Sustenta con tus datos del historial.</string>
+    <string name="analysis_q2">2. Compara los resultados de ángulos complementarios (ej. 30° y 60°). ¿Qué relación encuentras en el alcance? ¿Por qué crees que ocurre?</string>
+    <string name="analysis_q3">3. Observa cómo cambia la altura máxima al aumentar el ángulo. Describe la tendencia con base en tus experimentos.</string>
+    <string name="analysis_q4">4. Según la simulación, ¿cómo se comporta la velocidad horizontal durante el vuelo? ¿Y la vertical? Explica la diferencia que observas.</string>
+    <string name="analysis_q5">5. Cambia la gravedad (por ejemplo, la de la Luna, 1.6 m/s²). ¿Cómo cambian el alcance y la trayectoria? Justifica con los resultados.</string>
+
+    <!-- Decision Challenges -->
+    <string name="challenges_title">Retos de Decisión</string>
+    <string name="challenge_q1">1. Un proyectil debe alcanzar un blanco a 50 metros con una velocidad inicial fija. Usa el simulador para encontrar el ángulo adecuado. ¿Qué ángulo eliges y por qué?</string>
+    <string name="challenge_q2">2. Tienes que superar un muro de cierta altura a cierta distancia. Experimenta con distintos ángulos y velocidades hasta lograrlo. Documenta la combinación que funcionó y explica tu razonamiento.</string>
+    <string name="challenge_q3">3. Si solo puedes cambiar UNA variable (velocidad o ángulo) para aumentar el alcance, ¿cuál cambiarías? Apóyate en los datos del simulador para decidir.</string>
+    <string name="hint_answer">Escribe tu respuesta aquí...</string>
 </resources>
