@@ -12,7 +12,6 @@ data class ProjectileExperimentDto(
     val flightTime: Double = 0.0,
     val maxHeight: Double = 0.0,
     val horizontalRange: Double = 0.0,
-    val trajectory: List<TrajectoryPointDto> = emptyList(),
     val createdAtMillis: Long = 0L
 ) {
     fun toDomain(id: String): ProjectileExperiment {
@@ -26,7 +25,7 @@ data class ProjectileExperimentDto(
             flightTime = flightTime,
             maxHeight = maxHeight,
             horizontalRange = horizontalRange,
-            trajectory = trajectory.map { it.toDomain() },
+            trajectory = emptyList(),
             createdAtMillis = createdAtMillis
         )
     }
@@ -43,7 +42,6 @@ fun ProjectileExperiment.toDto(userCode: String = ""): ProjectileExperimentDto {
         flightTime = flightTime,
         maxHeight = maxHeight,
         horizontalRange = horizontalRange,
-        trajectory = trajectory.map { it.toDto() },
         createdAtMillis = createdAtMillis
     )
 }
