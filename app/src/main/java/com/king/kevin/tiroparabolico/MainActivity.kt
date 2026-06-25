@@ -12,8 +12,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
+import com.king.kevin.tiroparabolico.core.extensions.toDisplay
 import com.king.kevin.tiroparabolico.core.extensions.toNullableDouble
-import com.king.kevin.tiroparabolico.core.utils.toDisplay
 import com.king.kevin.tiroparabolico.databinding.ActivityMainBinding
 import com.king.kevin.tiroparabolico.domain.model.ProjectileExperiment
 import com.king.kevin.tiroparabolico.presentation.screens.AnalysisActivity

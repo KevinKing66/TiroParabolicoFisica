@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.king.kevin.tiroparabolico.core.utils.toDisplay
+import com.king.kevin.tiroparabolico.core.extensions.toDisplay
 import com.king.kevin.tiroparabolico.databinding.ItemExperimentBinding
 import com.king.kevin.tiroparabolico.domain.model.ProjectileExperiment
 import java.text.SimpleDateFormat
