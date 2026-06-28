@@ -24,7 +24,6 @@ class ChallengesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         binding = ActivityChallengesBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

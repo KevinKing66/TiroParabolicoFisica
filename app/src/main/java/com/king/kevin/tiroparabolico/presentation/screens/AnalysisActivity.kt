@@ -24,7 +24,6 @@ class AnalysisActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         binding = ActivityAnalysisBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
