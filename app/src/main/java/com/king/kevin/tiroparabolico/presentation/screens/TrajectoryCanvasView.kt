@@ -10,6 +10,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import com.king.kevin.tiroparabolico.R
 import com.king.kevin.tiroparabolico.domain.model.TrajectoryPoint
+import java.util.Locale
 import kotlin.math.max
 
 class TrajectoryCanvasView @JvmOverloads constructor(
@@ -45,6 +46,11 @@ class TrajectoryCanvasView @JvmOverloads constructor(
         strokeJoin = Paint.Join.ROUND
         style = Paint.Style.STROKE
         alpha = 60
+    }
+    private val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = ContextCompat.getColor(context, R.color.text_secondary)
+        textSize = 24f
+        textAlign = Paint.Align.CENTER
     }
 
     private var trajectory: List<TrajectoryPoint> = emptyList()
@@ -104,8 +110,8 @@ class TrajectoryCanvasView @JvmOverloads constructor(
     }
 
     private fun updateProgressFromTouch(touchX: Float) {
-        val left = paddingLeft + 28f
-        val right = width - paddingRight - 20f
+        val left = paddingLeft + 70f
+        val right = width - paddingRight - 30f
         val x = touchX.coerceIn(left, right)
         animationProgress = (x - left) / (right - left)
         notifyCurrentPoint()
@@ -114,16 +120,19 @@ class TrajectoryCanvasView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        drawGrid(canvas)
-        drawAxes(canvas)
-        if (trajectory.isEmpty()) return
+        
+        val left = paddingLeft + 70f
+        val right = width - paddingRight - 30f
+        val top = paddingTop + 30f
+        val bottom = height - paddingBottom - 60f
+        
+        val maxX = if (trajectory.isNotEmpty()) max(trajectory.maxOf { it.x }, 1.0) else 10.0
+        val maxY = if (trajectory.isNotEmpty()) max(trajectory.maxOf { it.y }, 1.0) else 10.0
 
-        val left = paddingLeft + 28f
-        val right = width - paddingRight - 20f
-        val top = paddingTop + 24f
-        val bottom = height - paddingBottom - 32f
-        val maxX = max(trajectory.maxOf { it.x }, 1.0)
-        val maxY = max(trajectory.maxOf { it.y }, 1.0)
+        drawGrid(canvas, left, right, top, bottom, maxX, maxY)
+        drawAxes(canvas, left, right, top, bottom)
+        
+        if (trajectory.isEmpty()) return
         
         // Draw full trajectory path with lower alpha or different style
         val fullPath = Path()
@@ -160,27 +169,32 @@ class TrajectoryCanvasView @JvmOverloads constructor(
         }
     }
 
-    private fun drawAxes(canvas: Canvas) {
-        val left = paddingLeft + 28f
-        val bottom = height - paddingBottom - 32f
-        canvas.drawLine(left, paddingTop + 20f, left, bottom, axisPaint)
-        canvas.drawLine(left, bottom, width - paddingRight - 18f, bottom, axisPaint)
+    private fun drawAxes(canvas: Canvas, left: Float, right: Float, top: Float, bottom: Float) {
+        canvas.drawLine(left, top - 10f, left, bottom, axisPaint)
+        canvas.drawLine(left, bottom, right + 10f, bottom, axisPaint)
     }
 
-    private fun drawGrid(canvas: Canvas) {
-        val columns = 4
-        val rows = 4
-        val left = paddingLeft + 28f
-        val right = width - paddingRight - 20f
-        val top = paddingTop + 24f
-        val bottom = height - paddingBottom - 32f
+    private fun drawGrid(canvas: Canvas, left: Float, right: Float, top: Float, bottom: Float, maxX: Double, maxY: Double) {
+        val columns = 5
+        val rows = 5
+        
         repeat(columns + 1) { index ->
             val x = left + ((right - left) * index / columns)
             canvas.drawLine(x, top, x, bottom, gridPaint)
+            
+            val labelValue = (maxX * index / columns)
+            val label = String.format(Locale.US, "%.1f", labelValue)
+            canvas.drawText(label, x, bottom + 35f, textPaint)
         }
+        
+        val yTextPaint = Paint(textPaint).apply { textAlign = Paint.Align.RIGHT }
         repeat(rows + 1) { index ->
-            val y = top + ((bottom - top) * index / rows)
+            val y = bottom - ((bottom - top) * index / rows)
             canvas.drawLine(left, y, right, y, gridPaint)
+            
+            val labelValue = (maxY * index / rows)
+            val label = String.format(Locale.US, "%.1f", labelValue)
+            canvas.drawText(label, left - 15f, y + 8f, yTextPaint)
         }
     }
 
