@@ -38,23 +38,78 @@ class TrajectoryCanvasView @JvmOverloads constructor(
         strokeWidth = 1.5f
         style = Paint.Style.STROKE
     }
+    private val backgroundPathPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = ContextCompat.getColor(context, R.color.trajectory_color)
+        strokeWidth = 7f
+        strokeCap = Paint.Cap.ROUND
+        strokeJoin = Paint.Join.ROUND
+        style = Paint.Style.STROKE
+        alpha = 60
+    }
 
     private var trajectory: List<TrajectoryPoint> = emptyList()
     private var animationProgress: Float = 1f
     private var animator: ValueAnimator? = null
+    private var onPointSelected: ((TrajectoryPoint) -> Unit)? = null
 
-    fun submitTrajectory(points: List<TrajectoryPoint>) {
+    private val fullPath = Path()
+    private val animatedPath = Path()
+
+    fun setOnPointSelectedListener(listener: (TrajectoryPoint) -> Unit) {
+        onPointSelected = listener
+    }
+
+    fun submitTrajectory(points: List<TrajectoryPoint>, flightTimeSeconds: Double) {
         trajectory = points
         animator?.cancel()
         animationProgress = 0f
         animator = ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = 1200L
+            duration = (flightTimeSeconds * 1000).toLong().coerceAtLeast(100L)
             addUpdateListener {
                 animationProgress = it.animatedValue as Float
+                notifyCurrentPoint()
                 invalidate()
             }
             start()
         }
+    }
+
+    private fun notifyCurrentPoint() {
+        if (trajectory.isEmpty()) return
+        val index = (animationProgress * (trajectory.size - 1)).toInt().coerceIn(trajectory.indices)
+        onPointSelected?.invoke(trajectory[index])
+    }
+
+    override fun performClick(): Boolean {
+        super.performClick()
+        return true
+    }
+
+    override fun onTouchEvent(event: android.view.MotionEvent): Boolean {
+        if (trajectory.isEmpty()) return false
+        
+        when (event.action) {
+            android.view.MotionEvent.ACTION_DOWN -> {
+                performClick()
+                animator?.cancel()
+                updateProgressFromTouch(event.x)
+                return true
+            }
+            android.view.MotionEvent.ACTION_MOVE -> {
+                updateProgressFromTouch(event.x)
+                return true
+            }
+        }
+        return super.onTouchEvent(event)
+    }
+
+    private fun updateProgressFromTouch(touchX: Float) {
+        val left = paddingLeft + 28f
+        val right = width - paddingRight - 20f
+        val x = touchX.coerceIn(left, right)
+        animationProgress = (x - left) / (right - left)
+        notifyCurrentPoint()
+        invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -69,7 +124,19 @@ class TrajectoryCanvasView @JvmOverloads constructor(
         val bottom = height - paddingBottom - 32f
         val maxX = max(trajectory.maxOf { it.x }, 1.0)
         val maxY = max(trajectory.maxOf { it.y }, 1.0)
-        val visibleCount = max(2, (trajectory.size * animationProgress).toInt())
+        
+        // Draw full trajectory path with lower alpha or different style
+        val fullPath = Path()
+        trajectory.forEachIndexed { index, point ->
+            val px = left + ((point.x / maxX) * (right - left)).toFloat()
+            val py = bottom - ((point.y / maxY) * (bottom - top)).toFloat()
+            if (index == 0) fullPath.moveTo(px, py) else fullPath.lineTo(px, py)
+        }
+        val backgroundPathPaint = Paint(pathPaint).apply { alpha = 60 }
+        canvas.drawPath(fullPath, backgroundPathPaint)
+
+        // Draw animated/selected path
+        val visibleCount = max(1, (trajectory.size * animationProgress).toInt())
         val visiblePoints = trajectory.take(visibleCount)
         val path = Path()
 
@@ -84,10 +151,12 @@ class TrajectoryCanvasView @JvmOverloads constructor(
         }
 
         canvas.drawPath(path, pathPaint)
+        
+        // Current projectile position
         visiblePoints.lastOrNull()?.let { point ->
             val px = left + ((point.x / maxX) * (right - left)).toFloat()
             val py = bottom - ((point.y / maxY) * (bottom - top)).toFloat()
-            canvas.drawCircle(px, py, 11f, projectilePaint)
+            canvas.drawCircle(px, py, 13f, projectilePaint)
         }
     }
 

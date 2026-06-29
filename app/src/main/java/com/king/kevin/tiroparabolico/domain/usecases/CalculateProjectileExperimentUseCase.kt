@@ -40,16 +40,27 @@ class CalculateProjectileExperimentUseCase(
         gravity: Double,
         flightTime: Double
     ): List<TrajectoryPoint> {
-        if (flightTime == 0.0) {
+        if (flightTime <= 0.0) {
             return listOf(TrajectoryPoint(time = 0.0, x = 0.0, y = 0.0))
         }
 
-        val samples = 60
+        val samples = 100
         return (0..samples).map { index ->
             val time = flightTime * index / samples
             val x = horizontalVelocity * time
+            val currentVerticalVelocity = verticalVelocity - (gravity * time)
             val y = (verticalVelocity * time) - (0.5 * gravity * time.pow(2.0))
-            TrajectoryPoint(time = time, x = x, y = y.coerceAtLeast(0.0))
+            
+            val instantaneousVelocity = kotlin.math.sqrt(horizontalVelocity.pow(2.0) + currentVerticalVelocity.pow(2.0))
+            val instantaneousAngle = Math.toDegrees(kotlin.math.atan2(currentVerticalVelocity, horizontalVelocity))
+            
+            TrajectoryPoint(
+                time = time,
+                x = x,
+                y = y.coerceAtLeast(0.0),
+                instantaneousVelocity = instantaneousVelocity,
+                instantaneousAngle = instantaneousAngle
+            )
         }
     }
 }

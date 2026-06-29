@@ -58,6 +58,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupActions() {
+        binding.trajectoryView.setOnPointSelectedListener { point ->
+            binding.instantaneousPanel.visibility = View.VISIBLE
+            binding.instantaneousText.text = buildString {
+                append("Tiempo: ${point.time.toDisplay()} s | ")
+                append("Velocidad: ${point.instantaneousVelocity.toDisplay()} m/s\n")
+                append("Posicion: (${point.x.toDisplay()}, ${point.y.toDisplay()}) m | ")
+                append("Angulo: ${point.instantaneousAngle.toDisplay()}°")
+            }
+        }
+
         binding.simulateButton.setOnClickListener {
             clearInputErrors()
             val velocity = binding.velocityInput.text?.toString().orEmpty().toNullableDouble()
@@ -103,7 +113,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun renderExperiment(experiment: ProjectileExperiment?) {
-        if (experiment == null) return
+        if (experiment == null) {
+            binding.instantaneousPanel.visibility = View.GONE
+            return
+        }
 
         binding.resultsText.text = buildString {
             appendLine("Vx = ${experiment.horizontalVelocity.toDisplay()} m/s")
@@ -113,7 +126,7 @@ class MainActivity : AppCompatActivity() {
             appendLine("Alcance horizontal (R) = ${experiment.horizontalRange.toDisplay()} m")
             append("g = ${experiment.gravity.toDisplay()} m/s2")
         }
-        binding.trajectoryView.submitTrajectory(experiment.trajectory)
+        binding.trajectoryView.submitTrajectory(experiment.trajectory, experiment.flightTime)
     }
 
     private fun markMissingFields(velocity: Double?, angle: Double?) {
