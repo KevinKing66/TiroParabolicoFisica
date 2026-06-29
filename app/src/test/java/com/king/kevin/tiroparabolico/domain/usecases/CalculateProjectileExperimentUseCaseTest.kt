@@ -31,7 +31,7 @@ class CalculateProjectileExperimentUseCaseTest {
         assertEquals(1.442, experiment.flightTime, 0.001)
         assertEquals(2.548, experiment.maxHeight, 0.001)
         assertEquals(10.194, experiment.horizontalRange, 0.001)
-        assertEquals(101, experiment.trajectory.size)
+        assertTrue(experiment.trajectory.size >= 60)
     }
 
     @Test

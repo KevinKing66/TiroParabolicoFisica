@@ -44,7 +44,10 @@ class CalculateProjectileExperimentUseCase(
             return listOf(TrajectoryPoint(time = 0.0, x = 0.0, y = 0.0))
         }
 
-        val samples = 100
+        // Definimos una frecuencia de muestreo de 60Hz (60 puntos por segundo de vuelo real)
+        val samplingRate = 60.0
+        val samples = (flightTime * samplingRate).toInt().coerceAtLeast(1)
+
         return (0..samples).map { index ->
             val time = flightTime * index / samples
             val x = horizontalVelocity * time
