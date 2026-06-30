@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         android:theme="@style/Theme.TiroParabolico">
-<!--        <activity
+        <activity
             android:name=".MainActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
@@ -30,20 +30,21 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>-->
-
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustPan">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-
         </activity>
+
+        <!--        <activity
+                    android:name=".MainActivity"
+                    android:exported="true"
+                    android:windowSoftInputMode="adjustPan">
+
+                    <intent-filter>
+                        <action android:name="android.intent.action.MAIN"/>
+
+                        <category android:name="android.intent.category.LAUNCHER"/>
+                    </intent-filter>
+
+                </activity>
+                -->
 
         <activity
             android:name=".presentation.screens.AnalysisActivity"
@@ -54,6 +55,22 @@
             android:name=".presentation.screens.ChallengesActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".presentation.screens.MenuActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".presentation.screens.CourseManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".presentation.screens.AssignStudentsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".presentation.screens.LabManagementActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
