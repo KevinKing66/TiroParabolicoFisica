@@ -14,6 +14,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.king.kevin.tiroparabolico.MainActivity
 import com.king.kevin.tiroparabolico.PhysicsLabApplication
 import com.king.kevin.tiroparabolico.databinding.ActivityAuthBinding
+import com.king.kevin.tiroparabolico.core.extensions.setupSystemInsets
 import com.king.kevin.tiroparabolico.presentation.state.AuthMode
 import com.king.kevin.tiroparabolico.presentation.state.AuthUiState
 import com.king.kevin.tiroparabolico.presentation.viewmodel.AuthViewModel
@@ -28,21 +29,13 @@ class AuthActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setupSystemInsets(binding.authRoot)
         
         val app = application as PhysicsLabApplication
         viewModel = app.createAuthViewModel()
         
-        setupInsets()
         setupActions()
         observeUiState()
-    }
-
-    private fun setupInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.authRoot) { view, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
     }
 
     private fun setupActions() {

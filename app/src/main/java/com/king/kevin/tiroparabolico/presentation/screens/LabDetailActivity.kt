@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.king.kevin.tiroparabolico.MainActivity
 import com.king.kevin.tiroparabolico.PhysicsLabApplication
+import com.king.kevin.tiroparabolico.core.extensions.setupSystemInsets
 import com.king.kevin.tiroparabolico.databinding.ActivityLabDetailBinding
 import com.king.kevin.tiroparabolico.databinding.ItemLabQuestionBinding
 import com.king.kevin.tiroparabolico.databinding.ItemLabSectionBinding
@@ -36,6 +37,7 @@ class LabDetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityLabDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setupSystemInsets(binding.root)
 
         val app = application as PhysicsLabApplication
         viewModel = app.createLabViewModel()

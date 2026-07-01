@@ -20,6 +20,7 @@ import com.king.kevin.tiroparabolico.presentation.screens.AnalysisActivity
 import com.king.kevin.tiroparabolico.presentation.screens.ChallengesActivity
 import com.king.kevin.tiroparabolico.presentation.screens.ExperimentHistoryAdapter
 import com.king.kevin.tiroparabolico.presentation.state.ExperimentUiState
+import com.king.kevin.tiroparabolico.core.extensions.setupSystemInsets
 import com.king.kevin.tiroparabolico.presentation.viewmodel.ExperimentViewModel
 import kotlinx.coroutines.launch
 
@@ -32,22 +33,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setupSystemInsets(binding.main)
         
         val app = application as PhysicsLabApplication
         viewModel = app.createExperimentViewModel()
         
-        setupInsets()
         setupHistory()
         setupActions()
         observeUiState()
-    }
-
-    private fun setupInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { view, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
     }
 
     private fun setupHistory() {

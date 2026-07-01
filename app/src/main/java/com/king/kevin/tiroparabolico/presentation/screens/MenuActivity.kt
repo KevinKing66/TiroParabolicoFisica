@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.king.kevin.tiroparabolico.MainActivity
 import com.king.kevin.tiroparabolico.PhysicsLabApplication
+import com.king.kevin.tiroparabolico.core.extensions.setupSystemInsets
 import com.king.kevin.tiroparabolico.databinding.ActivityMenuBinding
 import com.king.kevin.tiroparabolico.databinding.ItemLabStudentBinding
 import com.king.kevin.tiroparabolico.domain.model.Lab
@@ -28,6 +29,7 @@ class MenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMenuBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setupSystemInsets(binding.root)
 
         val app = application as PhysicsLabApplication
         viewModel = app.createMenuViewModel()
