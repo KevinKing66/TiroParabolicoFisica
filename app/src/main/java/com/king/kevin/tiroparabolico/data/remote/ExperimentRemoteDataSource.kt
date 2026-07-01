@@ -1,12 +1,7 @@
 package com.king.kevin.tiroparabolico.data.remote
 
-import android.content.Context
-import com.google.firebase.FirebaseApp
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.king.kevin.tiroparabolico.core.constants.PhysicsConstants
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.king.kevin.tiroparabolico.data.dto.ProjectileExperimentDto
 import com.king.kevin.tiroparabolico.data.dto.toDto
 import com.king.kevin.tiroparabolico.data.repository.AuthSessionStorage
@@ -17,57 +12,32 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class ExperimentRemoteDataSource(
-    private val context: Context,
+    private val firestore: FirebaseFirestore,
     private val sessionStorage: AuthSessionStorage
 ) {
     fun observeExperiments(): Flow<Result<List<ProjectileExperiment>>> = callbackFlow {
-        val database = getDatabaseOrNull()
-        if (database == null) {
-            trySend(Result.failure(IllegalStateException("Firebase no esta configurado.")))
-            close()
-            return@callbackFlow
-        }
-
         val userCode = sessionStorage.get()?.code ?: ""
-        val reference = database.getReference(PhysicsConstants.EXPERIMENT_COLLECTION)
-
-        val query = reference.orderByChild("userCode").equalTo(userCode)
-
-        val listener = object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                val experiments = snapshot.children.mapNotNull { child ->
-                    child.getValue(ProjectileExperimentDto::class.java)?.toDomain(child.key ?: "")
-                }.sortedByDescending { it.createdAtMillis }
-
+        val subscription = firestore.collection("experiments")
+            .whereEqualTo("userCode", userCode)
+            .orderBy("createdAtMillis", Query.Direction.DESCENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(Result.failure(error))
+                    return@addSnapshotListener
+                }
+                val experiments = snapshot?.documents?.mapNotNull { doc ->
+                    doc.toObject(ProjectileExperimentDto::class.java)?.toDomain(doc.id)
+                } ?: emptyList()
                 trySend(Result.success(experiments))
             }
-
-            override fun onCancelled(error: DatabaseError) {
-                trySend(Result.failure(error.toException()))
-            }
-        }
-
-        query.addValueEventListener(listener)
-        awaitClose { query.removeEventListener(listener) }
+        awaitClose { subscription.remove() }
     }
 
     suspend fun saveExperiment(experiment: ProjectileExperiment): Result<Unit> = runCatching {
-        val database = getDatabaseOrNull()
-            ?: throw IllegalStateException("Firebase no esta configurado.")
-
         val userCode = sessionStorage.get()?.code ?: "anonymous"
-        val reference = database.getReference(PhysicsConstants.EXPERIMENT_COLLECTION)
-
-        reference.push().setValue(experiment.toDto(userCode)).await()
+        firestore.collection("experiments")
+            .add(experiment.toDto(userCode))
+            .await()
         Unit
-    }
-
-    private fun getDatabaseOrNull(): FirebaseDatabase? {
-        return runCatching {
-            if (FirebaseApp.getApps(context).isEmpty()) {
-                FirebaseApp.initializeApp(context)
-            }
-            FirebaseDatabase.getInstance()
-        }.getOrNull()
     }
 }

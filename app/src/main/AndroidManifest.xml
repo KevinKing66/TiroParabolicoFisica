@@ -73,6 +73,14 @@
             android:exported="false" />
 
         <activity
+            android:name=".presentation.screens.LabDetailActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".presentation.screens.LabResponsesActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".presentation.screens.InstitutionManagementActivity"
             android:exported="false" />
 

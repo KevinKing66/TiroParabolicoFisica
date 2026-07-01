@@ -5,15 +5,19 @@ import com.king.kevin.tiroparabolico.domain.model.Lab
 data class LabDto(
     val code: String = "",
     val name: String = "",
+    val description: String = "",
+    val exercise: String = "",
     val courseCode: String = "",
-    val questions: List<QuestionDto> = emptyList(),
+    val sections: List<QuestionSectionDto> = emptyList(),
     val createdAtMillis: Long = 0L
 ) {
     fun toDomain(): Lab = Lab(
         code = code,
         name = name,
+        description = description,
+        exercise = exercise,
         courseCode = courseCode,
-        questions = questions.map { it.toDomain() },
+        sections = sections.map { it.toDomain() },
         createdAtMillis = createdAtMillis
     )
 }
@@ -21,7 +25,9 @@ data class LabDto(
 fun Lab.toDto(): LabDto = LabDto(
     code = code,
     name = name,
+    description = description,
+    exercise = exercise,
     courseCode = courseCode,
-    questions = questions.map { it.toDto() },
+    sections = sections.map { it.toDto() },
     createdAtMillis = createdAtMillis
 )

@@ -2,20 +2,27 @@ package com.king.kevin.tiroparabolico.presentation.screens
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.king.kevin.tiroparabolico.MainActivity
 import com.king.kevin.tiroparabolico.PhysicsLabApplication
 import com.king.kevin.tiroparabolico.databinding.ActivityMenuBinding
+import com.king.kevin.tiroparabolico.databinding.ItemLabStudentBinding
+import com.king.kevin.tiroparabolico.domain.model.Lab
 import com.king.kevin.tiroparabolico.presentation.viewmodel.MenuViewModel
 import kotlinx.coroutines.launch
 
 class MenuActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMenuBinding
     private lateinit var viewModel: MenuViewModel
+    private val labAdapter = LabStudentAdapter { openLabDetail(it) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,8 +32,24 @@ class MenuActivity : AppCompatActivity() {
         val app = application as PhysicsLabApplication
         viewModel = app.createMenuViewModel()
 
+        setupRecyclerView()
         setupActions()
         observeUiState()
+    }
+
+    private fun setupRecyclerView() {
+        binding.rvStudentLabs.apply {
+            layoutManager = LinearLayoutManager(this@MenuActivity)
+            adapter = labAdapter
+        }
+    }
+
+    private fun openLabDetail(lab: Lab) {
+        val intent = Intent(this, LabDetailActivity::class.java).apply {
+            putExtra("LAB_CODE", lab.code)
+            putExtra("COURSE_CODE", lab.courseCode)
+        }
+        startActivity(intent)
     }
 
     private fun setupActions() {
@@ -75,8 +98,36 @@ class MenuActivity : AppCompatActivity() {
                     binding.teacherMenu.visibility = if (isTeacher) View.VISIBLE else View.GONE
                     binding.adminOnlyMenu.visibility = if (isAdmin) View.VISIBLE else View.GONE
                     binding.studentMenu.visibility = if (role == "student") View.VISIBLE else View.GONE
+
+                    labAdapter.submitList(state.studentLabs)
                 }
             }
         }
+    }
+
+    private class LabStudentAdapter(val onDoLab: (Lab) -> Unit) : 
+        RecyclerView.Adapter<LabStudentAdapter.ViewHolder>() {
+        
+        private var list = emptyList<Lab>()
+        fun submitList(newList: List<Lab>) {
+            list = newList
+            notifyDataSetChanged()
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+            val b = ItemLabStudentBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            return ViewHolder(b)
+        }
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val item = list[position]
+            holder.binding.tvLabName.text = item.name
+            holder.binding.tvLabCode.text = "ID: ${item.code}"
+            holder.binding.btnDoLab.setOnClickListener { onDoLab(item) }
+            holder.binding.root.setOnClickListener { onDoLab(item) }
+        }
+
+        override fun getItemCount() = list.size
+        class ViewHolder(val binding: ItemLabStudentBinding) : RecyclerView.ViewHolder(binding.root)
     }
 }

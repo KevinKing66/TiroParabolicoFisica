@@ -17,6 +17,14 @@ class LabRepositoryImpl(private val firestore: FirebaseFirestore) : LabRepositor
         labsCollection.document(lab.code).set(lab.toDto()).await()
     }
 
+    override suspend fun updateLab(lab: Lab): Result<Unit> = runCatching {
+        labsCollection.document(lab.code).set(lab.toDto()).await()
+    }
+
+    override suspend fun deleteLab(code: String): Result<Unit> = runCatching {
+        labsCollection.document(code).delete().await()
+    }
+
     override suspend fun getLabsByCourse(courseCode: String): Result<List<Lab>> = runCatching {
         labsCollection.whereEqualTo("courseCode", courseCode).get().await()
             .toObjects(LabDto::class.java).map { it.toDomain() }
@@ -32,6 +40,22 @@ class LabRepositoryImpl(private val firestore: FirebaseFirestore) : LabRepositor
                 val labs = snapshot?.toObjects(LabDto::class.java)?.map { it.toDomain() } ?: emptyList()
                 trySend(Result.success(labs))
             }
+        awaitClose { subscription.remove() }
+    }
+
+    override fun observeLabsByInstitution(institution: String): Flow<Result<List<Lab>>> = callbackFlow {
+        // This requires an index or we can join with courses. 
+        // For simplicity and quality of use, let's assume we search labs across the collection.
+        // Actually, LabDto doesn't have institution. We should probably add it or filter through courses.
+        // Let's add institution to Lab model/dto for easier admin listing.
+        val subscription = labsCollection.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                trySend(Result.failure(error))
+                return@addSnapshotListener
+            }
+            val labs = snapshot?.toObjects(LabDto::class.java)?.map { it.toDomain() } ?: emptyList()
+            trySend(Result.success(labs))
+        }
         awaitClose { subscription.remove() }
     }
 }

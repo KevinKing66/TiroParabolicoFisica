@@ -46,11 +46,12 @@ import com.king.kevin.tiroparabolico.domain.usecases.CreateUserByAdminUseCase
 
 class PhysicsLabApplication : Application() {
 
-    private val authRemoteDataSource by lazy { AuthRemoteDataSource(firestore) }
-    private val experimentRemoteDataSource by lazy { ExperimentRemoteDataSource(this, authSessionStorage) }
-    private val academicRemoteDataSource by lazy { AcademicRemoteDataSource(this, authSessionStorage) }
-    private val authSessionStorage by lazy { AuthSessionStorage(this) }
-    private val firestore by lazy { FirebaseFirestore.getInstance() }
+    private val firestoreInstance: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
+    private val authSessionStorage: AuthSessionStorage by lazy { AuthSessionStorage(this) }
+
+    private val authRemoteDataSource: AuthRemoteDataSource by lazy { AuthRemoteDataSource(firestoreInstance) }
+    private val experimentRemoteDataSource: ExperimentRemoteDataSource by lazy { ExperimentRemoteDataSource(firestoreInstance, authSessionStorage) }
+    private val academicRemoteDataSource: AcademicRemoteDataSource by lazy { AcademicRemoteDataSource(firestoreInstance, authSessionStorage) }
 
     val authRepository: AuthRepository by lazy {
         AuthRepositoryImpl(authRemoteDataSource, authSessionStorage)
@@ -62,13 +63,13 @@ class PhysicsLabApplication : Application() {
         AcademicRepositoryImpl(academicRemoteDataSource)
     }
     val courseRepository: CourseRepository by lazy {
-        CourseRepositoryImpl(firestore)
+        CourseRepositoryImpl(firestoreInstance)
     }
     val labRepository: LabRepository by lazy {
-        LabRepositoryImpl(firestore)
+        LabRepositoryImpl(firestoreInstance)
     }
     val institutionRepository: InstitutionRepository by lazy {
-        InstitutionRepositoryImpl(firestore)
+        InstitutionRepositoryImpl(firestoreInstance)
     }
 
     private val validateAuthInputUseCase by lazy { ValidateAuthInputUseCase() }
@@ -117,7 +118,10 @@ class PhysicsLabApplication : Application() {
 
     fun createLabViewModel() = LabViewModel(
         addLab = AddLabToCourseUseCase(labRepository, courseRepository, validateRoleUseCase, getCurrentUserCodeUseCase),
-        labRepository = labRepository
+        labRepository = labRepository,
+        authRepository = authRepository,
+        courseRepository = courseRepository,
+        academicRepository = academicRepository
     )
 
     fun createAdminViewModel() = AdminViewModel(
