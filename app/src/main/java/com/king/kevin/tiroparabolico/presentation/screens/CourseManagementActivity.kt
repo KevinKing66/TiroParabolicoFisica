@@ -31,6 +31,7 @@ class CourseManagementActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.uiState.collect { state ->
                 binding.progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
+                binding.btnCreateCourse.isEnabled = !state.isLoading
                 
                 // UX: Hide management panel if not allowed
                 binding.createCoursePanel.visibility = if (state.canManage) View.VISIBLE else View.GONE
@@ -42,6 +43,8 @@ class CourseManagementActivity : AppCompatActivity() {
                 
                 state.successMessage?.let {
                     Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
+                    binding.etCourseCode.text?.clear()
+                    binding.etCourseName.text?.clear()
                     viewModel.clearMessages()
                 }
             }
@@ -52,14 +55,13 @@ class CourseManagementActivity : AppCompatActivity() {
         binding.btnCreateCourse.setOnClickListener {
             val code = binding.etCourseCode.text.toString()
             val name = binding.etCourseName.text.toString()
-            val inst = binding.etInstitution.text.toString()
             
             if (code.isBlank() || name.isBlank()) {
                 binding.etCourseCode.error = "Obligatorio"
                 return@setOnClickListener
             }
             
-            viewModel.saveCourse(code, name, inst)
+            viewModel.saveCourse(code, name)
         }
     }
 }

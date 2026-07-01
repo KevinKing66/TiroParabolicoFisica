@@ -40,10 +40,14 @@ class LabViewModel(
             _uiState.update { it.copy(isLoading = true, errorMessage = null, successMessage = null) }
             val lab = Lab(code, name, courseCode, questions)
             addLab(lab).onSuccess {
-                _uiState.update { it.copy(isLoading = false, successMessage = "Laboratorio agregado") }
+                _uiState.update { it.copy(isLoading = false, successMessage = "Laboratorio agregado correctamente") }
             }.onFailure { error ->
-                _uiState.update { it.copy(isLoading = false, errorMessage = error.message) }
+                _uiState.update { it.copy(isLoading = false, errorMessage = error.message ?: "Error al agregar lab") }
             }
         }
+    }
+
+    fun clearMessages() {
+        _uiState.update { it.copy(errorMessage = null, successMessage = null) }
     }
 }

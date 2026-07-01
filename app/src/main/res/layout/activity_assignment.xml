@@ -21,35 +21,54 @@
             android:textStyle="bold"
             android:textSize="20sp"/>
 
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Seleccione un curso:"
+            android:layout_marginTop="16dp"
+            android:textSize="14sp"/>
+
+        <Spinner
+            android:id="@+id/spinnerCourses"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:hint="Codigo del curso">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etCourseCode"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-        </com.google.android.material.textfield.TextInputLayout>
+            android:layout_marginTop="4dp"
+            android:minHeight="48dp"
+            android:background="@drawable/panel_background" />
 
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="Codigo del estudiante">
+            android:layout_marginTop="16dp"
+            android:hint="Buscar estudiante por código (min 3 carac.)">
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etStudentCode"
+                android:id="@+id/etSearchStudent"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:inputType="textCapCharacters" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvStudentSearch"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/tint_panel_background" />
+
+        <TextView
+            android:id="@+id/tvSelectedCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Seleccionados: 0"
+            android:textStyle="italic" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAssign"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Asignar al curso"/>
+            android:text="Asignar Seleccionados al Curso"/>
     </LinearLayout>
 </LinearLayout>

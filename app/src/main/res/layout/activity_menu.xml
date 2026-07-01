@@ -56,6 +56,33 @@
                 android:text="Configurar Laboratorios"
                 android:layout_marginBottom="8dp"
                 app:icon="@android:drawable/ic_menu_preferences"/>
+
+            <!-- Admin Specific Options -->
+            <LinearLayout
+                android:id="@+id/adminOnlyMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnManageInstitutions"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gestionar Instituciones"
+                    android:layout_marginBottom="8dp"
+                    app:icon="@android:drawable/ic_menu_myplaces"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAdminCreateUser"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Crear Usuario (Admin)"
+                    android:layout_marginBottom="8dp"
+                    app:icon="@android:drawable/ic_menu_add"/>
+            </LinearLayout>
         </LinearLayout>
 
         <!-- Panel para Estudiantes -->

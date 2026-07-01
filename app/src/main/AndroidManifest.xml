@@ -71,6 +71,14 @@
         <activity
             android:name=".presentation.screens.LabManagementActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".presentation.screens.InstitutionManagementActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".presentation.screens.AdminUserCreationActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

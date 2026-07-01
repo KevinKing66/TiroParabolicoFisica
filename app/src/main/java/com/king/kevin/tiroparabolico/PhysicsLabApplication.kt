@@ -38,10 +38,14 @@ import com.king.kevin.tiroparabolico.presentation.viewmodel.CourseViewModel
 import com.king.kevin.tiroparabolico.presentation.viewmodel.ExperimentViewModel
 import com.king.kevin.tiroparabolico.presentation.viewmodel.LabViewModel
 import com.king.kevin.tiroparabolico.presentation.viewmodel.MenuViewModel
+import com.king.kevin.tiroparabolico.presentation.viewmodel.AdminViewModel
+import com.king.kevin.tiroparabolico.data.repository.InstitutionRepositoryImpl
+import com.king.kevin.tiroparabolico.domain.repository.InstitutionRepository
+import com.king.kevin.tiroparabolico.domain.usecases.CreateUserByAdminUseCase
 
 class PhysicsLabApplication : Application() {
 
-    private val authRemoteDataSource by lazy { AuthRemoteDataSource() }
+    private val authRemoteDataSource by lazy { AuthRemoteDataSource(firestore) }
     private val experimentRemoteDataSource by lazy { ExperimentRemoteDataSource(this, authSessionStorage) }
     private val academicRemoteDataSource by lazy { AcademicRemoteDataSource(this, authSessionStorage) }
     private val authSessionStorage by lazy { AuthSessionStorage(this) }
@@ -62,11 +66,15 @@ class PhysicsLabApplication : Application() {
     val labRepository: LabRepository by lazy {
         LabRepositoryImpl(firestore)
     }
+    val institutionRepository: InstitutionRepository by lazy {
+        InstitutionRepositoryImpl(firestore)
+    }
 
     private val validateAuthInputUseCase by lazy { ValidateAuthInputUseCase() }
     private val validateExperimentInputUseCase by lazy { ValidateExperimentInputUseCase() }
     private val validateRoleUseCase by lazy { ValidateRoleUseCase(authRepository) }
     private val getCurrentUserCodeUseCase by lazy { GetCurrentUserCodeUseCase(authRepository) }
+    private val createUserByAdminUseCase by lazy { CreateUserByAdminUseCase(authRepository, validateRoleUseCase) }
 
     fun createAuthViewModel() = AuthViewModel(
         loginUseCase = LoginUseCase(authRepository, validateAuthInputUseCase),
@@ -91,6 +99,7 @@ class PhysicsLabApplication : Application() {
 
     fun createCourseViewModel() = CourseViewModel(
         courseRepository = courseRepository,
+        authRepository = authRepository,
         createCourse = CreateCourseUseCase(courseRepository, validateRoleUseCase),
         updateCourse = UpdateCourseUseCase(courseRepository, labRepository, validateRoleUseCase, getCurrentUserCodeUseCase),
         validateRole = validateRoleUseCase,
@@ -99,11 +108,19 @@ class PhysicsLabApplication : Application() {
 
     fun createAssignmentViewModel() = AssignmentViewModel(
         assignStudent = AssignStudentToCourseUseCase(courseRepository, validateRoleUseCase, getCurrentUserCodeUseCase),
-        validateRole = validateRoleUseCase
+        validateRole = validateRoleUseCase,
+        authRepository = authRepository,
+        courseRepository = courseRepository
     )
 
     fun createLabViewModel() = LabViewModel(
         addLab = AddLabToCourseUseCase(labRepository, courseRepository, validateRoleUseCase, getCurrentUserCodeUseCase),
         labRepository = labRepository
+    )
+
+    fun createAdminViewModel() = AdminViewModel(
+        institutionRepository = institutionRepository,
+        createUserByAdmin = createUserByAdminUseCase,
+        validateRole = validateRoleUseCase
     )
 }

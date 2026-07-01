@@ -46,6 +46,14 @@ class MenuActivity : AppCompatActivity() {
             startActivity(Intent(this, LabManagementActivity::class.java))
         }
 
+        binding.btnManageInstitutions.setOnClickListener {
+            startActivity(Intent(this, InstitutionManagementActivity::class.java))
+        }
+
+        binding.btnAdminCreateUser.setOnClickListener {
+            startActivity(Intent(this, AdminUserCreationActivity::class.java))
+        }
+
         binding.btnLogout.setOnClickListener {
             viewModel.logout()
             startActivity(Intent(this, AuthActivity::class.java))
@@ -60,9 +68,13 @@ class MenuActivity : AppCompatActivity() {
                     val session = state.session ?: return@collect
                     binding.tvWelcome.text = "Hola, ${session.fullName}"
                     
-                    val isTeacher = session.role.lowercase() == "teacher" || session.role.lowercase() == "admin"
+                    val role = session.role.lowercase()
+                    val isTeacher = role == "teacher" || role == "admin"
+                    val isAdmin = role == "admin"
+
                     binding.teacherMenu.visibility = if (isTeacher) View.VISIBLE else View.GONE
-                    binding.studentMenu.visibility = if (!isTeacher) View.VISIBLE else View.GONE
+                    binding.adminOnlyMenu.visibility = if (isAdmin) View.VISIBLE else View.GONE
+                    binding.studentMenu.visibility = if (role == "student") View.VISIBLE else View.GONE
                 }
             }
         }

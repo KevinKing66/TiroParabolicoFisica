@@ -29,12 +29,17 @@ class LabManagementActivity : AppCompatActivity() {
     private fun observeState() {
         lifecycleScope.launch {
             viewModel.uiState.collect { state ->
-                // Basic check for lab visibility if needed
+                binding.btnAddLab.isEnabled = !state.isLoading
+                
                 state.errorMessage?.let { 
                     Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
+                    viewModel.clearMessages()
                 }
                 state.successMessage?.let {
                     Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
+                    binding.etLabCode.text?.clear()
+                    binding.etLabName.text?.clear()
+                    viewModel.clearMessages()
                 }
             }
         }

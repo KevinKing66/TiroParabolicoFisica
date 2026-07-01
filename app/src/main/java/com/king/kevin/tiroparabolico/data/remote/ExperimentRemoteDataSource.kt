@@ -30,7 +30,7 @@ class ExperimentRemoteDataSource(
 
         val userCode = sessionStorage.get()?.code ?: ""
         val reference = database.getReference(PhysicsConstants.EXPERIMENT_COLLECTION)
-        
+
         val query = reference.orderByChild("userCode").equalTo(userCode)
 
         val listener = object : ValueEventListener {
@@ -38,7 +38,7 @@ class ExperimentRemoteDataSource(
                 val experiments = snapshot.children.mapNotNull { child ->
                     child.getValue(ProjectileExperimentDto::class.java)?.toDomain(child.key ?: "")
                 }.sortedByDescending { it.createdAtMillis }
-                
+
                 trySend(Result.success(experiments))
             }
 

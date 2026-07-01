@@ -5,5 +5,6 @@ data class UserSession(
     val fullName: String,
     val code: String,
     val role: String,
-    val course: String
+    val course: String,
+    val institution: String = ""
 )

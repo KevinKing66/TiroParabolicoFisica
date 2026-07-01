@@ -19,7 +19,7 @@ class AcademicRemoteDataSource(
 
         val userCode = sessionStorage.get()?.code ?: "anonymous"
         val reference = database.getReference(PhysicsConstants.ACADEMIC_COLLECTION)
-        
+
         reference.push().setValue(response.toDto(userCode)).await()
         Unit
     }

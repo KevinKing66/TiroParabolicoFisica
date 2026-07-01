@@ -3,6 +3,7 @@ package com.king.kevin.tiroparabolico.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.king.kevin.tiroparabolico.domain.model.Course
+import com.king.kevin.tiroparabolico.domain.repository.AuthRepository
 import com.king.kevin.tiroparabolico.domain.repository.CourseRepository
 import com.king.kevin.tiroparabolico.domain.usecases.CreateCourseUseCase
 import com.king.kevin.tiroparabolico.domain.usecases.GetCurrentUserCodeUseCase
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 
 class CourseViewModel(
     private val courseRepository: CourseRepository,
+    private val authRepository: AuthRepository,
     private val createCourse: CreateCourseUseCase,
     private val updateCourse: UpdateCourseUseCase,
     private val validateRole: ValidateRoleUseCase,
@@ -58,16 +60,19 @@ class CourseViewModel(
         }
     }
 
-    fun saveCourse(code: String, name: String, institution: String) {
+    fun saveCourse(code: String, name: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null, successMessage = null) }
-            val userCode = getCurrentUserCode() ?: ""
+            val session = authRepository.getCurrentSession()
+            val userCode = session?.code ?: ""
+            val institution = session?.institution ?: ""
+
             val course = Course(code, name, institution, userCode)
             
             createCourse(course).onSuccess {
                 _uiState.update { it.copy(isLoading = false, successMessage = "Curso creado exitosamente") }
             }.onFailure { error ->
-                _uiState.update { it.copy(isLoading = false, errorMessage = error.message) }
+                _uiState.update { it.copy(isLoading = false, errorMessage = error.message ?: "Error al crear curso") }
             }
         }
     }
