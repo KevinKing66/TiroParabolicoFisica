@@ -60,6 +60,30 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Guardar Curso"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancelEdit"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cancelar Edicion"
+            android:visibility="gone" />
     </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Listado de Cursos"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:textColor="@color/text_primary"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCourses"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"/>
 
 </LinearLayout>

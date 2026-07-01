@@ -41,11 +41,13 @@ class CourseViewModel(
     private fun loadCourses() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            val role = validateRole.getCurrentRole()
-            val userCode = getCurrentUserCode() ?: ""
+            val session = authRepository.getCurrentSession()
+            val role = session?.role?.lowercase() ?: ""
+            val userCode = session?.code ?: ""
+            val institution = session?.institution ?: ""
             
             val flow = if (role == "admin") {
-                courseRepository.observeAllCourses()
+                courseRepository.observeCoursesByInstitution(institution)
             } else {
                 courseRepository.observeCoursesByOwner(userCode)
             }
@@ -67,21 +69,32 @@ class CourseViewModel(
             val userCode = session?.code ?: ""
             val institution = session?.institution ?: ""
 
-            val course = Course(code, name, institution, userCode)
+            val toEdit = uiState.value.courseToEdit
+            val course = Course(code, name, institution, if (toEdit != null) toEdit.ownerId else userCode)
             
-            createCourse(course).onSuccess {
-                _uiState.update { it.copy(isLoading = false, successMessage = "Curso creado exitosamente") }
+            val result = if (toEdit == null) createCourse(course) else updateCourse(course)
+
+            result.onSuccess {
+                _uiState.update { it.copy(isLoading = false, successMessage = if (toEdit == null) "Curso creado" else "Curso actualizado", courseToEdit = null) }
             }.onFailure { error ->
-                _uiState.update { it.copy(isLoading = false, errorMessage = error.message ?: "Error al crear curso") }
+                _uiState.update { it.copy(isLoading = false, errorMessage = error.message ?: "Error en operación") }
             }
         }
     }
 
-    fun editCourse(course: Course) {
+    fun selectCourseForEdit(course: Course) {
+        _uiState.update { it.copy(courseToEdit = course) }
+    }
+
+    fun cancelEdit() {
+        _uiState.update { it.copy(courseToEdit = null) }
+    }
+
+    fun deleteCourse(code: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null, successMessage = null) }
-            updateCourse(course).onSuccess {
-                _uiState.update { it.copy(isLoading = false, successMessage = "Curso actualizado") }
+            courseRepository.deleteCourse(code).onSuccess {
+                _uiState.update { it.copy(isLoading = false, successMessage = "Curso eliminado") }
             }.onFailure { error ->
                 _uiState.update { it.copy(isLoading = false, errorMessage = error.message) }
             }

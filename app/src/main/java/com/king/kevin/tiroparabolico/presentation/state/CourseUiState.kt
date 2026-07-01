@@ -7,5 +7,6 @@ data class CourseUiState(
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val successMessage: String? = null,
-    val canManage: Boolean = false
+    val canManage: Boolean = false,
+    val courseToEdit: Course? = null
 )
