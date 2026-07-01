@@ -12,8 +12,9 @@
         android:layout_height="wrap_content" />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:orientation="vertical"
         android:layout_marginStart="8dp">
 
@@ -31,4 +32,25 @@
             android:textSize="12sp"
             android:textColor="@color/text_secondary" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvEnrollmentStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Inscrito"
+        android:textSize="10sp"
+        android:textColor="@color/brand_secondary"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:layout_marginEnd="8dp"/>
+
+    <ImageButton
+        android:id="@+id/btnRemoveStudent"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@android:drawable/ic_menu_close_clear_cancel"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:visibility="gone"
+        android:contentDescription="Eliminar"
+        android:layout_marginEnd="4dp"/>
 </LinearLayout>

@@ -18,6 +18,7 @@ import com.king.kevin.tiroparabolico.domain.repository.ExperimentRepository
 import com.king.kevin.tiroparabolico.domain.repository.LabRepository
 import com.king.kevin.tiroparabolico.domain.usecases.AddLabToCourseUseCase
 import com.king.kevin.tiroparabolico.domain.usecases.AssignStudentToCourseUseCase
+import com.king.kevin.tiroparabolico.domain.usecases.RemoveStudentFromCourseUseCase
 import com.king.kevin.tiroparabolico.domain.usecases.CalculateProjectileExperimentUseCase
 import com.king.kevin.tiroparabolico.domain.usecases.CreateCourseUseCase
 import com.king.kevin.tiroparabolico.domain.usecases.GetCurrentSessionUseCase
@@ -107,7 +108,8 @@ class PhysicsLabApplication : Application() {
     )
 
     fun createAssignmentViewModel() = AssignmentViewModel(
-        assignStudent = AssignStudentToCourseUseCase(courseRepository, validateRoleUseCase, getCurrentUserCodeUseCase),
+        assignStudent = AssignStudentToCourseUseCase(courseRepository, authRepository, validateRoleUseCase),
+        removeStudent = RemoveStudentFromCourseUseCase(courseRepository, authRepository, validateRoleUseCase),
         validateRole = validateRoleUseCase,
         authRepository = authRepository,
         courseRepository = courseRepository

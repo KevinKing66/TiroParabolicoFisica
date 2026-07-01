@@ -7,6 +7,7 @@ import com.king.kevin.tiroparabolico.domain.model.UserMinimal
 import com.king.kevin.tiroparabolico.domain.repository.AuthRepository
 import com.king.kevin.tiroparabolico.domain.repository.CourseRepository
 import com.king.kevin.tiroparabolico.domain.usecases.AssignStudentToCourseUseCase
+import com.king.kevin.tiroparabolico.domain.usecases.RemoveStudentFromCourseUseCase
 import com.king.kevin.tiroparabolico.domain.usecases.ValidateRoleUseCase
 import com.king.kevin.tiroparabolico.presentation.state.CourseUiState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,8 +18,10 @@ import kotlinx.coroutines.launch
 
 data class AssignmentUiState(
     val courses: List<Course> = emptyList(),
+    val selectedCourseCode: String? = null,
     val studentsFound: List<UserMinimal> = emptyList(),
     val selectedStudents: List<UserMinimal> = emptyList(),
+    val enrolledStudents: List<UserMinimal> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
     val successMessage: String? = null,
@@ -27,6 +30,7 @@ data class AssignmentUiState(
 
 class AssignmentViewModel(
     private val assignStudent: AssignStudentToCourseUseCase,
+    private val removeStudent: RemoveStudentFromCourseUseCase,
     private val validateRole: ValidateRoleUseCase,
     private val authRepository: AuthRepository,
     private val courseRepository: CourseRepository
@@ -38,15 +42,51 @@ class AssignmentViewModel(
     init {
         val allowed = validateRole(listOf("teacher", "admin"))
         _uiState.update { it.copy(canManage = allowed) }
-        loadTeacherCourses()
+        loadAvailableCourses()
     }
 
-    private fun loadTeacherCourses() {
-        val user = authRepository.getCurrentSession() ?: return
+    fun selectCourse(courseCode: String) {
+        _uiState.update { it.copy(selectedCourseCode = courseCode) }
+        loadEnrolledStudents(courseCode)
+    }
+
+    private fun loadEnrolledStudents(courseCode: String) {
         viewModelScope.launch {
-            courseRepository.observeCoursesByOwner(user.code).collect { result ->
+            _uiState.update { it.copy(isLoading = true) }
+            val course = uiState.value.courses.find { it.code == courseCode } ?: return@launch
+            
+            // Optimizamos: obtenemos todos los estudiantes una sola vez
+            authRepository.searchStudentsByCode("").onSuccess { allStudents ->
+                val enrolled = allStudents.filter { student -> 
+                    course.studentCodes.contains(student.code) 
+                }
+                _uiState.update { it.copy(enrolledStudents = enrolled, isLoading = false) }
+            }.onFailure {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
+    private fun loadAvailableCourses() {
+        val session = authRepository.getCurrentSession() ?: return
+        val role = session.role.lowercase()
+        
+        viewModelScope.launch {
+            val flow = if (role == "admin") {
+                courseRepository.observeCoursesByInstitution(session.institution)
+            } else {
+                courseRepository.observeCoursesByOwner(session.code)
+            }
+
+            flow.collect { result ->
                 result.onSuccess { list ->
                     _uiState.update { it.copy(courses = list) }
+                    
+                    if (uiState.value.selectedCourseCode == null && list.isNotEmpty()) {
+                        selectCourse(list[0].code)
+                    } else if (uiState.value.selectedCourseCode != null) {
+                        loadEnrolledStudents(uiState.value.selectedCourseCode!!)
+                    }
                 }
             }
         }
@@ -98,6 +138,20 @@ class AssignmentViewModel(
             } else {
                 _uiState.update { it.copy(isLoading = false, errorMessage = "Hubo errores en algunas asignaciones") }
             }
+        }
+    }
+
+    fun removeFromCourse(studentCode: String) {
+        val courseCode = uiState.value.selectedCourseCode ?: return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null, successMessage = null) }
+            removeStudent(courseCode, studentCode)
+                .onSuccess {
+                    _uiState.update { it.copy(isLoading = false, successMessage = "Estudiante desvinculado") }
+                }
+                .onFailure { e ->
+                    _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
+                }
         }
     }
     

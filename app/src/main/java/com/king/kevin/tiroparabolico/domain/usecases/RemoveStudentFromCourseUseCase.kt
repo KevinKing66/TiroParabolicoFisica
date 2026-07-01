@@ -3,7 +3,7 @@ package com.king.kevin.tiroparabolico.domain.usecases
 import com.king.kevin.tiroparabolico.domain.repository.AuthRepository
 import com.king.kevin.tiroparabolico.domain.repository.CourseRepository
 
-class AssignStudentToCourseUseCase(
+class RemoveStudentFromCourseUseCase(
     private val courseRepository: CourseRepository,
     private val authRepository: AuthRepository,
     private val validateRole: ValidateRoleUseCase
@@ -20,18 +20,14 @@ class AssignStudentToCourseUseCase(
             ?: return Result.failure(Exception("Curso no encontrado"))
 
         if (role == "teacher" && course.ownerId != session.code) {
-            return Result.failure(Exception("Solo el propietario puede asignar estudiantes."))
+            return Result.failure(Exception("Solo el propietario puede desvincular estudiantes."))
         }
         
         if (role == "admin" && course.institution != session.institution) {
-            return Result.failure(Exception("No tiene permisos sobre cursos de otras instituciones."))
+            return Result.failure(Exception("No tiene permisos sobre esta institución."))
         }
 
-        if (course.studentCodes.contains(studentCode)) {
-            return Result.failure(Exception("El estudiante ya está asignado a este curso."))
-        }
-
-        val updatedStudents = course.studentCodes + studentCode
+        val updatedStudents = course.studentCodes.filter { it != studentCode }
         return courseRepository.updateCourse(course.copy(studentCodes = updatedStudents))
     }
 }

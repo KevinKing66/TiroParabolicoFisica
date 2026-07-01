@@ -36,6 +36,16 @@
             android:minHeight="48dp"
             android:background="@drawable/panel_background" />
 
+        <TextView
+            android:id="@+id/tvNoCourses"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="No se encontraron cursos disponibles."
+            android:textColor="@color/projectile_color"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:layout_marginTop="4dp" />
+
         <com.google.android.material.textfield.TextInputLayout
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
@@ -70,5 +80,26 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Asignar Seleccionados al Curso"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/grid_color"
+            android:layout_marginTop="24dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estudiantes Inscritos en el Curso"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="16dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvEnrolledStudents"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/tint_panel_background" />
     </LinearLayout>
 </LinearLayout>
