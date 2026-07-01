@@ -64,19 +64,19 @@ class LabViewModel(
         }
     }
 
+    private val labsByCourse = mutableMapOf<String, List<Lab>>()
+
     private fun observeLabsForCourses(courseCodes: List<String>) {
         viewModelScope.launch {
             courseCodes.forEach { code ->
                 labRepository.observeLabsByCourse(code).collect { result ->
                     result.onSuccess { newLabs ->
-                        _uiState.update { state ->
-                            val currentLabs = state.labs.toMutableList()
-                            newLabs.forEach { lab ->
-                                val index = currentLabs.indexOfFirst { it.code == lab.code }
-                                if (index >= 0) currentLabs[index] = lab else currentLabs.add(lab)
-                            }
-                            state.copy(labs = currentLabs.sortedByDescending { it.createdAtMillis })
-                        }
+                        labsByCourse[code] = newLabs
+                        val consolidatedLabs = labsByCourse.values.flatten()
+                            .distinctBy { it.code }
+                            .sortedByDescending { it.createdAtMillis }
+                        
+                        _uiState.update { it.copy(labs = consolidatedLabs) }
                     }
                 }
             }
@@ -107,7 +107,39 @@ class LabViewModel(
             academicRepository.observeResponsesByLab(labCode).collect { result ->
                 result.onSuccess { list ->
                     _uiState.update { it.copy(labResponses = list) }
+                }.onFailure { error ->
+                    _uiState.update { it.copy(errorMessage = "Error al cargar respuestas: ${error.message}") }
                 }
+            }
+        }
+    }
+
+    fun observeStudentResponsesForLab(studentCode: String, labCode: String) {
+        viewModelScope.launch {
+            academicRepository.observeResponsesByStudentAndLab(studentCode, labCode).collect { result ->
+                result.onSuccess { list ->
+                    _uiState.update { it.copy(labResponses = list) } // For students, this holds THEIR responses
+                }
+            }
+        }
+    }
+
+    fun submitSectionAnswers(labId: String, sectionId: String, answers: Map<String, String>) {
+        val session = authRepository.getCurrentSession() ?: return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val response = AcademicResponse(
+                userCode = session.code,
+                type = com.king.kevin.tiroparabolico.domain.model.AcademicType.LAB_SECTION,
+                labId = labId,
+                sectionId = sectionId,
+                answers = answers,
+                createdAtMillis = System.currentTimeMillis()
+            )
+            academicRepository.saveAcademicResponse(response).onSuccess {
+                _uiState.update { it.copy(isLoading = false, successMessage = "Sección enviada correctamente") }
+            }.onFailure { error ->
+                _uiState.update { it.copy(isLoading = false, errorMessage = error.message) }
             }
         }
     }

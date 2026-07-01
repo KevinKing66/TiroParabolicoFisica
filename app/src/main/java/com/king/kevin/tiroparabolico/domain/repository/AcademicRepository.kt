@@ -7,4 +7,5 @@ import kotlinx.coroutines.flow.Flow
 interface AcademicRepository {
     suspend fun saveAcademicResponse(response: AcademicResponse): Result<Unit>
     fun observeResponsesByLab(labId: String): Flow<Result<List<AcademicResponse>>>
+    fun observeResponsesByStudentAndLab(studentCode: String, labId: String): Flow<Result<List<AcademicResponse>>>
 }

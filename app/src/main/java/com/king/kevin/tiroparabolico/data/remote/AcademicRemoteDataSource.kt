@@ -26,7 +26,6 @@ class AcademicRemoteDataSource(
     fun observeResponsesByLab(labId: String): Flow<Result<List<AcademicResponse>>> = callbackFlow {
         val subscription = firestore.collection("academic_responses")
             .whereEqualTo("labId", labId)
-            .orderBy("createdAtMillis", Query.Direction.DESCENDING)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     trySend(Result.failure(error))
@@ -34,7 +33,26 @@ class AcademicRemoteDataSource(
                 }
                 val responses = snapshot?.documents?.mapNotNull { doc ->
                     doc.toObject(AcademicResponseDto::class.java)?.toDomain(doc.id)
-                } ?: emptyList()
+                }?.sortedByDescending { it.createdAtMillis } ?: emptyList()
+                
+                trySend(Result.success(responses))
+            }
+        awaitClose { subscription.remove() }
+    }
+
+    fun observeResponsesByStudentAndLab(studentCode: String, labId: String): Flow<Result<List<AcademicResponse>>> = callbackFlow {
+        val subscription = firestore.collection("academic_responses")
+            .whereEqualTo("userCode", studentCode)
+            .whereEqualTo("labId", labId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(Result.failure(error))
+                    return@addSnapshotListener
+                }
+                val responses = snapshot?.documents?.mapNotNull { doc ->
+                    doc.toObject(AcademicResponseDto::class.java)?.toDomain(doc.id)
+                }?.sortedByDescending { it.createdAtMillis } ?: emptyList()
+
                 trySend(Result.success(responses))
             }
         awaitClose { subscription.remove() }

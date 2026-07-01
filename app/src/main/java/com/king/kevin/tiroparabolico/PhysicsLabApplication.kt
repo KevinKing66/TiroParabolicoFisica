@@ -96,7 +96,9 @@ class PhysicsLabApplication : Application() {
 
     fun createMenuViewModel() = MenuViewModel(
         authRepository = authRepository,
-        labRepository = labRepository
+        labRepository = labRepository,
+        courseRepository = courseRepository,
+        academicRepository = academicRepository
     )
 
     fun createCourseViewModel() = CourseViewModel(

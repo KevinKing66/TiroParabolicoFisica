@@ -16,4 +16,8 @@ class AcademicRepositoryImpl(
     override fun observeResponsesByLab(labId: String): Flow<Result<List<AcademicResponse>>> {
         return remoteDataSource.observeResponsesByLab(labId)
     }
+
+    override fun observeResponsesByStudentAndLab(studentCode: String, labId: String): Flow<Result<List<AcademicResponse>>> {
+        return remoteDataSource.observeResponsesByStudentAndLab(studentCode, labId)
+    }
 }

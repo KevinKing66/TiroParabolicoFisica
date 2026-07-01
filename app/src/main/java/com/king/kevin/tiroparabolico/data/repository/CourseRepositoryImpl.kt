@@ -38,6 +38,19 @@ class CourseRepositoryImpl(private val firestore: FirebaseFirestore) : CourseRep
         awaitClose { subscription.remove() }
     }
 
+    override fun observeCoursesByStudent(studentCode: String): Flow<Result<List<Course>>> = callbackFlow {
+        val subscription = coursesCollection.whereArrayContains("studentCodes", studentCode)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    trySend(Result.failure(error))
+                    return@addSnapshotListener
+                }
+                val courses = snapshot?.toObjects(CourseDto::class.java)?.map { it.toDomain() } ?: emptyList()
+                trySend(Result.success(courses))
+            }
+        awaitClose { subscription.remove() }
+    }
+
     override fun observeCoursesByInstitution(institution: String): Flow<Result<List<Course>>> = callbackFlow {
         val subscription = coursesCollection.whereEqualTo("institution", institution)
             .addSnapshotListener { snapshot, error ->

@@ -125,10 +125,23 @@ class LabManagementActivity : AppCompatActivity() {
             
             val courseCode = viewModel.uiState.value.availableCourses[selectedPos].code
             
-            val domainSections = sections.map { ms ->
-                QuestionSection(ms.id, ms.title, ms.questions.map { mq ->
-                    Question(mq.id, mq.text, QuestionType.TEXT)
-                })
+            // Filtramos secciones y preguntas vacías para garantizar la calidad de los datos
+            val domainSections = sections.mapNotNull { ms ->
+                val validQuestions = ms.questions.filter { it.text.isNotBlank() }
+                if (validQuestions.isNotEmpty()) {
+                    QuestionSection(
+                        id = ms.id,
+                        title = ms.title.ifBlank { "Sin título" },
+                        questions = validQuestions.map { mq ->
+                            Question(mq.id, mq.text, QuestionType.TEXT)
+                        }
+                    )
+                } else null
+            }
+
+            if (domainSections.isEmpty()) {
+                Snackbar.make(binding.root, "El laboratorio debe tener al menos una sección con preguntas válidas", Snackbar.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
             
             viewModel.createLab(code, name, desc, exec, courseCode, domainSections)
@@ -169,6 +182,7 @@ class LabManagementActivity : AppCompatActivity() {
         val intent = Intent(this, LabResponsesActivity::class.java).apply {
             putExtra("LAB_CODE", lab.code)
             putExtra("LAB_NAME", lab.name)
+            putExtra("COURSE_CODE", lab.courseCode)
         }
         startActivity(intent)
     }
